@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI - Informasi Kampus LP3I</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        #chat-window::-webkit-scrollbar { width: 6px; }
+        #chat-window::-webkit-scrollbar-track { background: #1f2937; }
+        #chat-window::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
+        #chat-window::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            background-color: #374151;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .dropdown-content button {
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+        }
+        .dropdown-content button:hover { background-color: #4b5563; }
+        .dropdown:hover .dropdown-content { display: block; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-2xl h-[85vh] flex flex-col bg-gray-800 rounded-2xl shadow-2xl border border-gray-700 animate-fade-in">
+        <div class="p-4 border-b border-gray-700 flex items-center space-x-4">
+            <img src="{{ url_for('static', filename='lp3i1.png') }}" alt="Logo LP3I" class="w-12 h-12 rounded-full object-cover border-2 border-purple-400 flex-shrink-0">
+            <div>
+                <h1 class="text-xl font-bold">AI LP3I</h1>
+                <p class="text-sm text-green-400 flex items-center">
+                    <span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+                    Online
+                </p>
+            </div>
+        </div>
+
+        <div id="chat-window" class="flex-1 p-6 overflow-y-auto space-y-6"></div>
+
+        <div id="status-indicator" class="px-6 pb-2 h-6"><p id="status-text" class="text-sm text-gray-400"></p></div>
+
+        <div class="p-4 border-t border-gray-700">
+            <div class="flex items-center bg-gray-700 rounded-xl">
+                <div class="dropdown">
+                    <button id="ai-features-button" title="✨ Fitur AI" class="text-white font-semibold rounded-lg p-3 m-1 hover:bg-purple-600 transition-colors duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sparkles"><path d="M12 3L14.34 8.66L20 11L14.34 13.34L12 19L9.66 13.34L4 11L9.66 8.66L12 3z"/><path d="M20 3L18.5 6.5L15 8L18.5 9.5L20 13L21.5 9.5L25 8L21.5 6.5L20 3z"/><path d="M8 3L6.5 6.5L3 8L6.5 9.5L8 13L9.5 9.5L13 8L9.5 6.5L8 3z"/></svg>
+                    </button>
+                    <div id="dropdown-menu" class="dropdown-content animate-fade-in-up">
+                        <button id="career-plan-button">✨ Perencana Karir</button>
+                        <button id="compare-major-button">⚖️ Komparasi Jurusan</button>
+                        <button id="interview-sim-button">🎙️ Simulasi Wawancara</button>
+                    </div>
+                </div>
+
+                <input type="text" id="user-input" class="flex-1 bg-transparent p-4 focus:outline-none placeholder-gray-400" placeholder="Tanyakan sesuatu atau pilih fitur AI...">
+                <button id="send-button" class="bg-purple-600 text-white font-semibold rounded-lg p-3 m-2 hover:bg-purple-700 transition-all duration-200 disabled:bg-gray-500 disabled:cursor-not-allowed transform hover:scale-110 disabled:scale-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatWindow = document.getElementById('chat-window');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const statusText = document.getElementById('status-text');
+
+        const careerPlanButton = document.getElementById('career-plan-button');
+        const compareMajorButton = document.getElementById('compare-major-button');
+        const interviewSimButton = document.getElementById('interview-sim-button');
+        
+        let activeFeature = null;
+        let majorToCompare = '';
+
+        const knowledgeBase = {
+            "pendaftaran": { keywords: ["daftar", "pendaftaran", "registrasi", "mendaftar"], jawaban: "Pendaftaran mahasiswa baru di LP3I biasanya dibuka dalam beberapa gelombang. Anda bisa mendaftar secara online melalui website resmi LP3I atau datang langsung ke kampus terdekat." },
+            "jurusan": { keywords: ["jurusan", "prodi", "program studi"], jawaban: "LP3I memiliki banyak pilihan program studi, seperti Administrasi Bisnis, Komputerisasi Akuntansi, Informatika Komputer, Sekretaris, dan Hubungan Masyarakat." },
+            "biaya": { keywords: ["biaya", "harga", "spp"], jawaban: "Biaya kuliah di LP3I bervariasi tergantung program studi dan lokasi kampus. Untuk rincian biaya terbaru, sangat disarankan untuk menghubungi bagian administrasi kampus LP3I terdekat." },
+            "lokasi": { keywords: ["lokasi", "alamat", "kampus"], jawaban: "LP3I memiliki banyak cabang yang tersebar di seluruh Indonesia. Untuk alamat lengkap kampus yang Anda tuju, silakan cek di website resmi LP3I." }
+        };
+        
+        function displayMessage(text, sender) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('flex', 'items-end', 'max-w-xl', 'animate-fade-in-up');
+            let bubbleClass = sender === 'user' ? 'bg-purple-600 text-white rounded-t-xl rounded-l-xl' : 'bg-gray-700 text-white rounded-t-xl rounded-r-xl';
+            if (sender === 'user') messageElement.classList.add('self-end', 'flex-row-reverse');
+            else messageElement.classList.add('self-start');
+            messageElement.innerHTML = `<div class="p-4 ${bubbleClass} shadow-md"><p>${text.replace(/\n/g, '<br>')}</p></div>`;
+            chatWindow.appendChild(messageElement);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function updateStatus(text) { statusText.textContent = text; }
+        
+        async function callGeminiAPI(prompt) {
+            // **PERBAIKAN DI SINI**
+            // Menggunakan URL absolut untuk memastikan browser dapat menemukannya.
+            const apiUrl = 'http://127.0.0.1:5000/api/generate';
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: prompt }),
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `API request failed with status ${response.status}`);
+            }
+            const result = await response.json();
+            return result.text;
+        }
+        
+        async function getRegularBotResponse(query) {
+            const lowerCaseQuery = query.toLowerCase();
+            if (["halo", "hai", "hi"].includes(lowerCaseQuery)) return "Halo! Ada yang bisa saya bantu?";
+            
+            const creatorKeywords = ["dibuat siapa", "siapa yang buat", "penciptamu", "siapa yg buat", "yg buat kamu"];
+            if (creatorKeywords.some(k => lowerCaseQuery.includes(k))) {
+                return "Halo! Saya adalah model bahasa AI yang dikembangkan oleh M Alif fadlan.";
+            }
+            
+            updateStatus("Menganalisis pertanyaan...");
+            const routerPrompt = `Pilih alat: 'local_search' untuk info umum LP3I (pendaftaran, biaya, jurusan, lokasi) atau 'internet_search' untuk info spesifik/terkini. Jawab HANYA dengan nama alat. Pertanyaan: "${query}"`;
+            let tool_choice;
+            try {
+                tool_choice = await callGeminiAPI(routerPrompt);
+            } catch (error) {
+                console.error("Router call failed, defaulting to internet search:", error);
+                tool_choice = "internet_search"; 
+            }
+
+            if (typeof tool_choice === 'string' && tool_choice.toLowerCase().includes("local_search")) {
+                updateStatus("Mencari di database lokal...");
+                for (const key in knowledgeBase) {
+                    if (knowledgeBase[key].keywords.some(k => lowerCaseQuery.includes(k))) {
+                        return knowledgeBase[key].jawaban;
+                    }
+                }
+                updateStatus("Info tidak ditemukan di lokal, beralih ke internet...");
+            }
+            
+            updateStatus("Mencari informasi terbaru di internet...");
+            const synthesizerPrompt = `Anda asisten LP3I. Jawab pertanyaan ini berdasarkan pengetahuan umum atau pencarian internet: "${query}"`;
+            return await callGeminiAPI(synthesizerPrompt);
+        }
+
+        // --- FUNGSI-FUNGSI FITUR AI ---
+        async function generateCareerPlan(major) {
+            updateStatus(`✨ Membuat rencana karir untuk ${major}...`);
+            const prompt = `Anda adalah konselor karir ahli untuk lulusan LP3I. Buatkan daftar 3-4 prospek karir untuk jurusan "${major}". Untuk setiap karir, jelaskan: 1. Deskripsi Singkat (1-2 kalimat). 2. Skill Utama (3 poin). Format dengan markdown.`;
+            return callGeminiAPI(prompt);
+        }
+
+        async function generateMajorComparison(major1, major2) {
+            updateStatus(`⚖️ Membandingkan ${major1} dan ${major2}...`);
+            const prompt = `Anda adalah analis pendidikan. Buat tabel perbandingan (markdown) antara jurusan "${major1}" dan "${major2}" di LP3I. Kolom: 'Aspek', '${major1}', '${major2}'. Baris: 'Fokus Utama', 'Prospek Karir', 'Tipe Mahasiswa Ideal'.`;
+            return callGeminiAPI(prompt);
+        }
+
+        async function generateInterviewQuestions(jobTitle) {
+            updateStatus(`🎙️ Membuat pertanyaan wawancara untuk ${jobTitle}...`);
+            const prompt = `Anda adalah seorang HRD Manager. Buatkan daftar 5 pertanyaan wawancara yang paling sering ditanyakan untuk posisi "${jobTitle}", beserta tips singkat cara menjawabnya. Format dengan markdown.`;
+            return callGeminiAPI(prompt);
+        }
+
+        
+        async function handleUserInput() {
+            const query = userInput.value.trim();
+            if (query === "") return;
+
+            displayMessage(query, 'user');
+            userInput.value = "";
+            const currentFeature = activeFeature; 
+            activeFeature = null; 
+            
+            setUiLoading(true);
+            let botResponse = "";
+
+            try {
+                switch (currentFeature) {
+                    case 'career':
+                        botResponse = await generateCareerPlan(query);
+                        break;
+                    case 'compare_1':
+                        majorToCompare = query;
+                        activeFeature = 'compare_2';
+                        botResponse = `Baik, jurusan pertama adalah **${query}**. Sekarang, masukkan jurusan kedua yang ingin Anda bandingkan.`;
+                        break;
+                    case 'compare_2':
+                        botResponse = await generateMajorComparison(majorToCompare, query);
+                        majorToCompare = '';
+                        break;
+                    case 'interview':
+                        botResponse = await generateInterviewQuestions(query);
+                        break;
+                    default:
+                        botResponse = await getRegularBotResponse(query);
+                }
+            } catch (error) {
+                console.error("Error in handleUserInput:", error);
+                botResponse = "Maaf, terjadi kesalahan. Silakan coba lagi.";
+            } finally {
+                if (activeFeature !== 'compare_2') {
+                    displayMessage(botResponse, 'bot');
+                }
+                setUiLoading(false);
+                if (activeFeature !== 'compare_2') {
+                    userInput.placeholder = "Tanyakan sesuatu atau pilih fitur AI...";
+                }
+            }
+        }
+
+        function setUiLoading(isLoading) {
+            sendButton.disabled = isLoading;
+            userInput.disabled = isLoading;
+            if (!isLoading) {
+                updateStatus("");
+                userInput.focus();
+            }
+        }
+
+        // --- Event Listeners untuk Tombol Fitur ---
+        careerPlanButton.addEventListener('click', () => {
+            activeFeature = 'career';
+            displayMessage("Tentu! ✨ Jurusan apa yang Anda minati untuk saya buatkan rencana karirnya?", 'bot');
+            userInput.placeholder = "Ketik nama jurusan...";
+            userInput.focus();
+        });
+
+        compareMajorButton.addEventListener('click', () => {
+            activeFeature = 'compare_1';
+            displayMessage("Tentu! ⚖️ Masukkan nama jurusan pertama yang ingin dibandingkan.", 'bot');
+            userInput.placeholder = "Jurusan pertama, misal: Informatika Komputer";
+            userInput.focus();
+        });
+
+        interviewSimButton.addEventListener('click', () => {
+            activeFeature = 'interview';
+            displayMessage("Siap! 🎙️ Masukkan nama posisi pekerjaan untuk simulasi wawancara.", 'bot');
+            userInput.placeholder = "Posisi pekerjaan, misal: Digital Marketer";
+            userInput.focus();
+        });
+
+        sendButton.addEventListener('click', handleUserInput);
+        userInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleUserInput(); });
+
+        window.onload = () => {
+            displayMessage("Halo! Saya AI LP3I. Silakan bertanya, atau klik ikon ✨ di kiri untuk fitur canggih lainnya.", 'bot');
+            userInput.focus();
+        };
+    </script>
+</body>
+</html>
