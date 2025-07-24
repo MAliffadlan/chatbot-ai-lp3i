@@ -9,14 +9,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-7DN6K1JQDG"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7DN6K1JQDG"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-  gtag('config', 'G-7DN6K1JQDG');
-</script>
+      gtag('config', 'G-7DN6K1JQDG');
+    </script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         #chat-window::-webkit-scrollbar { width: 6px; }
@@ -67,6 +67,7 @@
     <div class="w-full max-w-2xl h-[85vh] flex flex-col bg-gray-800 rounded-2xl shadow-2xl border border-gray-700 animate-fade-in">
         <div class="p-4 border-b border-gray-700 flex items-center space-x-4">
            <img src="static/lp3i1.png" alt="Logo LP3I" class="w-12 h-12 rounded-full object-cover border-2 border-purple-400 flex-shrink-0">
+            
             <div>
                 <h1 class="text-xl font-bold">AI LP3I (Beta)</h1>
                 <p class="text-sm text-green-400 flex items-center">
@@ -115,10 +116,26 @@
         let majorToCompare = '';
 
         const knowledgeBase = {
-            "pendaftaran": { keywords: ["daftar", "pendaftaran", "registrasi", "mendaftar"], jawaban: "Pendaftaran mahasiswa baru di LP3I biasanya dibuka dalam beberapa gelombang. Anda bisa mendaftar secara online melalui website resmi LP3I atau datang langsung ke kampus terdekat." },
-            "jurusan": { keywords: ["jurusan", "prodi", "program studi"], jawaban: "LP3I memiliki banyak pilihan program studi, seperti Administrasi Bisnis, Komputerisasi Akuntansi, Informatika Komputer, Sekretaris, dan Hubungan Masyarakat." },
-            "biaya": { keywords: ["biaya", "harga", "spp"], jawaban: "Biaya kuliah di LP3I bervariasi tergantung program studi dan lokasi kampus. Untuk rincian biaya terbaru, sangat disarankan untuk menghubungi bagian administrasi kampus LP3I terdekat." },
-            "lokasi": { keywords: ["lokasi", "alamat", "kampus"], jawaban: "LP3I memiliki banyak cabang yang tersebar di seluruh Indonesia. Untuk alamat lengkap kampus yang Anda tuju, silakan cek di website resmi LP3I." }
+            "jurusan_jakarta": { 
+                keywords: ["jurusan", "prodi", "program studi", "jakarta"], 
+                jawaban: "Politeknik LP3I Jakarta (PLJ) menawarkan program D3 dan Sarjana Terapan. \n\n**Program D3:**\n- Administrasi Perkantoran\n- Hubungan Masyarakat\n- Akuntansi Komputer\n- Manajemen Informatika\n\n**Program Sarjana Terapan:**\n- Administrasi Bisnis Internasional\n- Bisnis Digital\n- Logistik Perdagangan Internasional\n\nSemua program dirancang agar lulusannya kompeten dan siap kerja." 
+            },
+            "kerjasama": {
+                keywords: ["kerjasama", "kolaborasi", "mitra", "partner"],
+                jawaban: "Politeknik LP3I Jakarta aktif berkolaborasi dengan berbagai pihak, contohnya dengan GRAVY LAB dari Korea Selatan di bidang pendidikan dan teknologi, serta melakukan pengabdian masyarakat bersama Dewan Masjid Indonesia."
+            },
+            "pendaftaran": { 
+                keywords: ["daftar", "pendaftaran", "registrasi", "mendaftar"], 
+                jawaban: "Pendaftaran mahasiswa baru di LP3I biasanya dibuka dalam beberapa gelombang. Anda bisa mendaftar secara online melalui website resmi LP3I atau datang langsung ke kampus terdekat." 
+            },
+            "biaya": { 
+                keywords: ["biaya", "harga", "spp"], 
+                jawaban: "Biaya kuliah di LP3I bervariasi tergantung program studi dan lokasi kampus. Untuk rincian biaya terbaru, sangat disarankan untuk menghubungi bagian administrasi kampus LP3I terdekat." 
+            },
+            "lokasi": { 
+                keywords: ["lokasi", "alamat", "kampus"], 
+                jawaban: "LP3I memiliki banyak cabang yang tersebar di seluruh Indonesia. Untuk alamat lengkap kampus yang Anda tuju, silakan cek di website resmi LP3I." 
+            }
         };
         
         function displayMessage(text, sender) {
@@ -135,8 +152,6 @@
         function updateStatus(text) { statusText.textContent = text; }
         
         async function callGeminiAPI(prompt) {
-            // **PERBAIKAN DI SINI**
-            // Menggunakan URL absolut untuk memastikan browser dapat menemukannya.
             const apiUrl = 'https://maliffadlan.pythonanywhere.com/api/generate';
             const response = await fetch(apiUrl, {
                 method: 'POST',
@@ -155,13 +170,13 @@
             const lowerCaseQuery = query.toLowerCase();
             if (["halo", "hai", "hi"].includes(lowerCaseQuery)) return "Halo! Ada yang bisa saya bantu?";
             
-            const creatorKeywords = ["dibuat siapa", "siapa yang buat", "penciptamu", "siapa yg buat", "yg buat kamu"];
+            const creatorKeywords = ["dibuat siapa", "siapa yang buat", "penciptamu", "siapa yg buat", "yg buat kamu", "dibuat sama siapa", "di buat sama siapa"];
             if (creatorKeywords.some(k => lowerCaseQuery.includes(k))) {
                 return "Halo! Saya adalah model bahasa AI yang dikembangkan oleh M Alif fadlan.";
             }
             
             updateStatus("Menganalisis pertanyaan...");
-            const routerPrompt = `Pilih alat: 'local_search' untuk info umum LP3I (pendaftaran, biaya, jurusan, lokasi) atau 'internet_search' untuk info spesifik/terkini. Jawab HANYA dengan nama alat. Pertanyaan: "${query}"`;
+            const routerPrompt = `Pilih alat: 'local_search' untuk info umum LP3I (pendaftaran, biaya, jurusan, lokasi, kerjasama) atau 'internet_search' untuk info spesifik/terkini. Jawab HANYA dengan nama alat. Pertanyaan: "${query}"`;
             let tool_choice;
             try {
                 tool_choice = await callGeminiAPI(routerPrompt);
