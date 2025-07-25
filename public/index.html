@@ -3,17 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI LP3I (Groq Edition)</title>
+    <title>AI LP3I (Final)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7DN6K1JQDG"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-7DN6K1JQDG');
-    </script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         #chat-window::-webkit-scrollbar { width: 6px; }
@@ -44,7 +36,7 @@
             <div class="flex items-center bg-gray-700 rounded-xl">
                 <input type="text" id="user-input" class="flex-1 bg-transparent p-4 focus:outline-none placeholder-gray-400" placeholder="Tanyakan sesuatu...">
                 <button id="send-button" class="bg-purple-600 text-white font-semibold rounded-lg p-3 m-2 hover:bg-purple-700 transition-all duration-200 disabled:bg-gray-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
             </div>
         </div>
@@ -58,9 +50,8 @@
 
         // --- Konfigurasi API (PENTING!) ---
         // Ganti dengan kunci API asli Anda dari Groq.
-        const GROQ_API_KEY = "GANTI_DENGAN_KUNCI_API_ANDA_NANTI_DI_NETLIFY";
+        const GROQ_API_KEY = "MASUKKAN_KUNCI_API_ANDA_NANTI_DI_NETLIFY";
         
-        // Alamat API Groq
         const API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
         // --- Otak Lokal Chatbot ---
@@ -104,9 +95,8 @@
                     "Content-Type": "application/json"
                 };
                 
-                // Format payload untuk Groq API (standar OpenAI)
                 const payload = { 
-                    "model": "llama3-8b-8192", // Model yang sangat cepat
+                    "model": "llama3-8b-8192",
                     "messages": [
                         {"role": "system", "content": "Anda adalah asisten AI dari kampus LP3I. Jawab pertanyaan dalam bahasa Indonesia dengan ramah dan informatif."},
                         {"role": "user", "content": query}
