@@ -3,9 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI LP3I (Final)</title>
+    <title>AI LP3I (Beta)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7DN6K1JQDG"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-7DN6K1JQDG');
+</script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         #chat-window::-webkit-scrollbar { width: 6px; }
@@ -21,7 +30,7 @@
         <div class="p-4 border-b border-gray-700 flex items-center space-x-4">
            <img src="static/lp3i1.png" alt="Logo LP3I" class="w-12 h-12 rounded-full object-cover border-2 border-purple-400 flex-shrink-0">
             <div>
-                <h1 class="text-xl font-bold">AI LP3I</h1>
+                <h1 class="text-xl font-bold">AI LP3I (Beta)</h1>
                 <p class="text-sm text-green-400 flex items-center">
                     <span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
                     Online
@@ -62,7 +71,7 @@
             },
              "creator": {
                 keywords: ["dibuat siapa", "siapa yang buat", "penciptamu", "siapa yg buat", "yg buat kamu"],
-                jawaban: "Saya adalah asisten AI yang dikembangkan oleh M Alif Fadlan."
+                jawaban: "Saya adalah asisten AI yang dikembangkan dan di program oleh M Alif Fadlan."
             }
         };
         
@@ -140,7 +149,7 @@
         userInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleUserInput(); });
 
         window.onload = () => {
-            displayMessage("Halo! Saya AI LP3I, ditenagai oleh Groq untuk respons super cepat. Silakan bertanya.", 'bot');
+            displayMessage("Halo! Saya AI LP3I, AI dengan respon super cepat. Silakan bertanya.", 'bot');
             userInput.focus();
         };
     </script>
