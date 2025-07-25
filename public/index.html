@@ -50,7 +50,7 @@
         .dropdown-content button:hover { background-color: #4b5563; }
         .dropdown:hover .dropdown-content { display: block; }
 
-        /* **PERUBAHAN 2:** Menambahkan kembali styling untuk konten Markdown */
+        /* Styling untuk konten Markdown */
         .rendered-markdown h1, .rendered-markdown h2, .rendered-markdown h3 { margin-top: 1rem; margin-bottom: 0.5rem; font-weight: 600; border-bottom: 1px solid #4b5563; padding-bottom: 0.25rem;}
         .rendered-markdown ul { list-style-type: disc; margin-left: 1.5rem; }
         .rendered-markdown ol { list-style-type: decimal; margin-left: 1.5rem; }
@@ -112,7 +112,6 @@
         
         let activeFeature = null;
         let majorToCompare = '';
-        // **PERUBAHAN 1: Menambahkan variabel untuk menyimpan riwayat chat**
         let chatHistory = [];
 
         const GROQ_API_KEY = "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";
@@ -168,78 +167,107 @@
             messageWrapper.appendChild(messageElement);
             chatWindow.appendChild(messageWrapper);
             chatWindow.scrollTop = chatWindow.scrollHeight;
+            // **PERUBAHAN 2:** Mengembalikan elemen pesan bot untuk streaming
+            return messageElement;
         }
 
         function updateStatus(text) { statusText.textContent = text; }
         
-        async function callGroqAPI(payload) {
+        // **PERUBAHAN 3: Fungsi callGroqAPI diubah untuk menangani streaming**
+        async function callGroqAPI(payload, botMessageElement) {
+            // Menambahkan properti stream: true ke payload
+            payload.stream = true;
+
             const headers = {
                 "Authorization": `Bearer ${GROQ_API_KEY}`,
                 "Content-Type": "application/json"
             };
             const response = await fetch(API_URL, { method: 'POST', headers: headers, body: JSON.stringify(payload) });
+            
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(`API request failed: ${errorData.error.message}`);
             }
-            const result = await response.json();
-            return result.choices[0].message.content;
-        }
 
-        async function getRegularBotResponse(query) {
-            const lowerCaseQuery = query.toLowerCase();
-            for (const key in knowledgeBase) {
-                if (knowledgeBase[key].keywords.some(k => lowerCaseQuery.includes(k))) {
-                    return knowledgeBase[key].jawaban;
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let fullResponse = "";
+
+            // Membaca stream data
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value);
+                const lines = chunk.split('\n');
+                
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const data = line.substring(6);
+                        if (data.trim() === '[DONE]') {
+                            return fullResponse;
+                        }
+                        try {
+                            const parsed = JSON.parse(data);
+                            const content = parsed.choices[0]?.delta?.content || "";
+                            if (content) {
+                                fullResponse += content;
+                                // Update tampilan secara real-time
+                                botMessageElement.innerHTML = marked.parse(fullResponse);
+                                chatWindow.scrollTop = chatWindow.scrollHeight;
+                            }
+                        } catch (e) {
+                            console.error("Could not parse stream data:", data);
+                        }
+                    }
                 }
             }
+            return fullResponse;
+        }
+
+        async function getRegularBotResponse(botMessageElement) {
             updateStatus("Menghubungi AI super cepat...");
             
-            // **PERUBAHAN 2: Membangun payload dari riwayat chat**
             const messages = [
                 {"role": "system", "content": "Anda adalah asisten AI dari kampus LP3I. Jawab pertanyaan dalam bahasa Indonesia dengan ramah dan informatif. Gunakan format Markdown jika perlu (misal: untuk daftar, teks tebal, atau tabel)."},
-                ...chatHistory, // Menyertakan pesan-pesan sebelumnya
-                {"role": "user", "content": query}
+                ...chatHistory
             ];
 
             const payload = { 
                 "model": "llama3-8b-8192",
                 "messages": messages
             };
-            return await callGroqAPI(payload);
+            return await callGroqAPI(payload, botMessageElement);
         }
 
-        async function getCareerPlan(major) {
-            updateStatus(`✨ Membuat rencana karir untuk ${major}...`);
+        async function getCareerPlan(botMessageElement) {
+            updateStatus(`✨ Membuat rencana karir...`);
             const messages = [
                 { role: "system", content: "Anda adalah seorang konselor karir ahli untuk lulusan Politeknik LP3I. Buatkan daftar 3-4 prospek karir. Untuk setiap karir, jelaskan: 1. Deskripsi Singkat (1-2 kalimat). 2. Skill Utama (3 poin). **Gunakan format Markdown** (heading, bold, list)." },
-                ...chatHistory,
-                { role: "user", content: `Jurusan: "${major}"` }
+                ...chatHistory
             ];
             const payload = { model: "llama3-8b-8192", messages: messages };
-            return await callGroqAPI(payload);
+            return await callGroqAPI(payload, botMessageElement);
         }
 
-        async function getMajorComparison(major1, major2) {
-            updateStatus(`⚖️ Membandingkan ${major1} dan ${major2}...`);
+        async function getMajorComparison(botMessageElement) {
+            updateStatus(`⚖️ Membandingkan jurusan...`);
             const messages = [
                 { role: "system", content: "Anda adalah analis pendidikan. Buat **tabel perbandingan dalam format Markdown** antara dua jurusan di LP3I. Kolom harus: 'Aspek', Jurusan 1, dan Jurusan 2. Baris harus: 'Fokus Utama', 'Prospek Karir', dan 'Tipe Mahasiswa Ideal'." },
-                ...chatHistory,
-                { role: "user", content: `Bandingkan antara "${major1}" dan "${major2}".` }
+                ...chatHistory
             ];
             const payload = { model: "llama3-8b-8192", messages: messages };
-            return await callGroqAPI(payload);
+            return await callGroqAPI(payload, botMessageElement);
         }
 
-        async function getInterviewQuestions(jobTitle) {
-            updateStatus(`🎙️ Membuat pertanyaan wawancara untuk ${jobTitle}...`);
+        async function getInterviewQuestions(botMessageElement) {
+            updateStatus(`🎙️ Membuat pertanyaan wawancara...`);
             const messages = [
                 { role: "system", content: "Anda adalah seorang HRD Manager. Buatkan daftar 5 pertanyaan wawancara yang paling sering ditanyakan untuk sebuah posisi, beserta tips singkat cara menjawabnya. **Gunakan format Markdown** (numbered list, bold)." },
-                ...chatHistory,
-                { role: "user", content: `Posisi: "${jobTitle}"` }
+                ...chatHistory
             ];
             const payload = { model: "llama3-8b-8192", messages: messages };
-            return await callGroqAPI(payload);
+            return await callGroqAPI(payload, botMessageElement);
         }
         
         async function handleUserInput() {
@@ -247,47 +275,63 @@
             if (query === "") return;
 
             displayMessage(query, 'user');
+            chatHistory.push({ role: 'user', content: query });
             userInput.value = "";
             sendButton.disabled = true;
+            
+            // **PERUBAHAN 4: Logika utama diubah untuk streaming**
+            const botMessageElement = displayMessage("", 'bot'); // Buat gelembung kosong
+            botMessageElement.innerHTML = `<div class="p-4 rendered-markdown"><span class="animate-pulse">...</span></div>`; // Tampilkan indikator mengetik
             
             let botResponse = "";
             const currentFeature = activeFeature;
             activeFeature = null;
 
             try {
-                switch (currentFeature) {
-                    case 'career':
-                        botResponse = await getCareerPlan(query);
+                // Cek knowledge base dulu
+                const lowerCaseQuery = query.toLowerCase();
+                let foundInKB = false;
+                for (const key in knowledgeBase) {
+                    if (knowledgeBase[key].keywords.some(k => lowerCaseQuery.includes(k))) {
+                        botResponse = knowledgeBase[key].jawaban;
+                        botMessageElement.innerHTML = `<div class="p-4 rendered-markdown">${marked.parse(botResponse)}</div>`;
+                        foundInKB = true;
                         break;
-                    case 'compare_1':
-                        majorToCompare = query;
-                        activeFeature = 'compare_2';
-                        botResponse = `Baik, jurusan pertama adalah **${query}**. Sekarang, masukkan jurusan kedua yang ingin Anda bandingkan.`;
-                        break;
-                    case 'compare_2':
-                        botResponse = await getMajorComparison(majorToCompare, query);
-                        majorToCompare = '';
-                        break;
-                    case 'interview':
-                        botResponse = await getInterviewQuestions(query);
-                        break;
-                    default:
-                        botResponse = await getRegularBotResponse(query);
+                    }
+                }
+
+                if (!foundInKB) {
+                    // Jika tidak ada di knowledge base, baru panggil AI
+                    switch (currentFeature) {
+                        case 'career':
+                            botResponse = await getCareerPlan(botMessageElement);
+                            break;
+                        case 'compare_1':
+                            majorToCompare = query;
+                            activeFeature = 'compare_2';
+                            botResponse = `Baik, jurusan pertama adalah **${query}**. Sekarang, masukkan jurusan kedua yang ingin Anda bandingkan.`;
+                            botMessageElement.innerHTML = `<div class="p-4 rendered-markdown">${marked.parse(botResponse)}</div>`;
+                            break;
+                        case 'compare_2':
+                            chatHistory.push({ role: 'assistant', content: `Baik, jurusan pertama adalah ${majorToCompare}. Sekarang, masukkan jurusan kedua yang ingin Anda bandingkan.` });
+                            chatHistory.push({ role: 'user', content: query });
+                            botResponse = await getMajorComparison(botMessageElement);
+                            majorToCompare = '';
+                            break;
+                        case 'interview':
+                            botResponse = await getInterviewQuestions(botMessageElement);
+                            break;
+                        default:
+                            botResponse = await getRegularBotResponse(botMessageElement);
+                    }
                 }
             } catch (error) {
                 console.error("Error in handleUserInput:", error);
                 botResponse = "Maaf, terjadi kesalahan saat menghubungi AI. Coba lagi dalam beberapa saat.";
+                botMessageElement.innerHTML = `<div class="p-4 rendered-markdown">${marked.parse(botResponse)}</div>`;
             } finally {
                 if (activeFeature !== 'compare_2') {
-                    displayMessage(botResponse, 'bot');
-                    
-                    // **PERUBAHAN 3: Menyimpan percakapan ke riwayat**
-                    // Kita simpan teks mentah (bukan HTML) untuk konsistensi
-                    const rawBotResponse = botResponse.replace(/<[^>]*>/g, '').replace(/<br>/g, '\n');
-                    chatHistory.push({ role: 'user', content: query });
-                    chatHistory.push({ role: 'assistant', content: rawBotResponse });
-
-                    // Menjaga agar riwayat tidak terlalu panjang (menyimpan 6 interaksi terakhir)
+                    chatHistory.push({ role: 'assistant', content: botResponse });
                     if (chatHistory.length > 12) {
                         chatHistory = chatHistory.slice(-12);
                     }
