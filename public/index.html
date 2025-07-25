@@ -6,15 +6,16 @@
     <title>AI Informasi Seputar Kampus LP3I (Beta)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- **PERUBAHAN 1:** Menambahkan kembali library Marked.js -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-7DN6K1JQDG"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-7DN6K1JQDG');
-</script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7DN6K1JQDG"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-7DN6K1JQDG');
+    </script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         #chat-window::-webkit-scrollbar { width: 6px; }
@@ -22,6 +23,44 @@
         #chat-window::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
+        
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            background-color: #374151;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .dropdown-content button {
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+        }
+        .dropdown-content button:hover { background-color: #4b5563; }
+        .dropdown:hover .dropdown-content { display: block; }
+
+        /* **PERUBAHAN 2:** Menambahkan kembali styling untuk konten Markdown */
+        .rendered-markdown h1, .rendered-markdown h2, .rendered-markdown h3 { margin-top: 1rem; margin-bottom: 0.5rem; font-weight: 600; border-bottom: 1px solid #4b5563; padding-bottom: 0.25rem;}
+        .rendered-markdown ul { list-style-type: disc; margin-left: 1.5rem; }
+        .rendered-markdown ol { list-style-type: decimal; margin-left: 1.5rem; }
+        .rendered-markdown li { margin-bottom: 0.25rem; }
+        .rendered-markdown p:not(:last-child) { margin-bottom: 0.5rem; }
+        .rendered-markdown table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        .rendered-markdown th, .rendered-markdown td { border: 1px solid #4b5563; padding: 0.5rem 0.75rem; }
+        .rendered-markdown th { background-color: #374151; }
+        .rendered-markdown a { color: #a78bfa; text-decoration: underline; }
+        .rendered-markdown strong { color: #e5e7eb; }
     </style>
 </head>
 <body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4">
@@ -43,9 +82,19 @@
 
         <div class="p-4 border-t border-gray-700">
             <div class="flex items-center bg-gray-700 rounded-xl">
-                <input type="text" id="user-input" class="flex-1 bg-transparent p-4 focus:outline-none placeholder-gray-400" placeholder="Tanyakan sesuatu...">
+                <div class="dropdown">
+                    <button id="ai-features-button" title="✨ Fitur AI" class="text-white font-semibold rounded-lg p-3 m-1 hover:bg-purple-600 transition-colors duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sparkles"><path d="M12 3L14.34 8.66L20 11L14.34 13.34L12 19L9.66 13.34L4 11L9.66 8.66L12 3z"/><path d="M20 3L18.5 6.5L15 8L18.5 9.5L20 13L21.5 9.5L25 8L21.5 6.5L20 3z"/><path d="M8 3L6.5 6.5L3 8L6.5 9.5L8 13L9.5 9.5L13 8L9.5 6.5L8 3z"/></svg>
+                    </button>
+                    <div id="dropdown-menu" class="dropdown-content animate-fade-in-up">
+                        <button id="career-plan-button">✨ Perencana Karir</button>
+                        <button id="compare-major-button">⚖️ Komparasi Jurusan</button>
+                        <button id="interview-sim-button">🎙️ Simulasi Wawancara</button>
+                    </div>
+                </div>
+                <input type="text" id="user-input" class="flex-1 bg-transparent p-4 focus:outline-none placeholder-gray-400" placeholder="Tanyakan sesuatu atau pilih fitur AI...">
                 <button id="send-button" class="bg-purple-600 text-white font-semibold rounded-lg p-3 m-2 hover:bg-purple-700 transition-all duration-200 disabled:bg-gray-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
             </div>
         </div>
@@ -56,77 +105,141 @@
         const userInput = document.getElementById('user-input');
         const sendButton = document.getElementById('send-button');
         const statusText = document.getElementById('status-text');
-
-        // --- Konfigurasi API (PENTING!) ---
-        // Ganti dengan kunci API asli Anda dari Groq.
-        const GROQ_API_KEY = "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";
         
+        const careerPlanButton = document.getElementById('career-plan-button');
+        const compareMajorButton = document.getElementById('compare-major-button');
+        const interviewSimButton = document.getElementById('interview-sim-button');
+        
+        let activeFeature = null;
+        let majorToCompare = '';
+        // **PERUBAHAN 1: Menambahkan variabel untuk menyimpan riwayat chat**
+        let chatHistory = [];
+
+        const GROQ_API_KEY = "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";
         const API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
-        // --- Otak Lokal Chatbot ---
         const knowledgeBase = {
+            "jurusan_jakarta": { 
+                keywords: ["jurusan", "prodi", "program studi", "jakarta"], 
+                jawaban: "Politeknik LP3I Jakarta (PLJ) menawarkan program D3 dan Sarjana Terapan. \n\n**Program D3:**\n- Administrasi Perkantoran\n- Hubungan Masyarakat\n- Akuntansi Komputer\n- Manajemen Informatika\n\n**Program Sarjana Terapan:**\n- Administrasi Bisnis Internasional\n- Bisnis Digital\n- Logistik Perdagangan Internasional\n\nSemua program dirancang agar lulusannya kompeten dan siap kerja." 
+            },
             "pendaftaran": { 
                 keywords: ["daftar", "pendaftaran", "registrasi", "mendaftar"], 
                 jawaban: "Anda bisa mendapatkan informasi pendaftaran terbaru dan mendaftar online di halaman PMB resmi Politeknik LP3I Jakarta: <a href='https://pmb.lp3ijkt.ac.id/' target='_blank' class='text-purple-400 hover:underline'>pmb.lp3ijkt.ac.id</a>" 
             },
-             "creator": {
-                keywords: ["dibuat siapa", "siapa yang buat", "penciptamu", "siapa yg buat", "yg buat kamu"],
+            "biaya": { 
+                keywords: ["biaya", "harga", "spp"], 
+                jawaban: "Informasi biaya kuliah sangat dinamis. Untuk mendapatkan rincian biaya yang paling akurat dan terbaru, Anda bisa langsung melihatnya di halaman pendaftaran resmi mereka di <a href='https://pmb.lp3ijkt.ac.id/' target='_blank' class='text-purple-400 hover:underline'>pmb.lp3ijkt.ac.id</a> atau menghubungi kontak admisi yang tertera di sana." 
+            },
+            "lokasi": { 
+                keywords: ["lokasi", "alamat", "kampus"], 
+                jawaban: "LP3I memiliki banyak cabang. Untuk Politeknik LP3I Jakarta, kampus utamanya berada di Menara Sentraya, Jl. Iskandarsyah Raya No.1A, Jakarta Selatan. Anda bisa melihat peta dan detail kontak lengkap di halaman kontak resmi mereka: <a href='https://lp3ijkt.ac.id/kontak/' target='_blank' class='text-purple-400 hover:underline'>lp3ijkt.ac.id/kontak/</a>" 
+            },
+            "creator": {
+                keywords: ["dibuat siapa", "siapa yang buat", "penciptamu", "siapa yg buat", "yg buat kamu","dibuat sama siapa"],
                 jawaban: "Saya adalah asisten AI yang dikembangkan dan di program oleh M Alif Fadlan."
             }
         };
         
         function displayMessage(text, sender) {
+            const messageWrapper = document.createElement('div');
+            messageWrapper.classList.add('flex', 'flex-col', 'max-w-xl', 'animate-fade-in-up');
+
+            let bubbleClass;
+            if (sender === 'user') {
+                messageWrapper.classList.add('self-end', 'items-end');
+                bubbleClass = 'bg-purple-600 text-white rounded-t-xl rounded-l-xl';
+            } else {
+                messageWrapper.classList.add('self-start', 'items-start');
+                bubbleClass = 'bg-gray-700 text-white rounded-t-xl rounded-r-xl';
+            }
+
             const messageElement = document.createElement('div');
-            messageElement.classList.add('flex', 'items-end', 'max-w-xl', 'animate-fade-in-up');
-            let bubbleClass = sender === 'user' ? 'bg-purple-600 text-white rounded-t-xl rounded-l-xl' : 'bg-gray-700 text-white rounded-t-xl rounded-r-xl';
-            if (sender === 'user') messageElement.classList.add('self-end', 'flex-row-reverse');
-            else messageElement.classList.add('self-start');
-            messageElement.innerHTML = `<div class="p-4 ${bubbleClass} shadow-md"><p>${text.replace(/\n/g, '<br>')}</p></div>`;
-            chatWindow.appendChild(messageElement);
+            const bubbleClasses = bubbleClass.split(' ');
+            messageElement.classList.add('p-4', 'shadow-md', ...bubbleClasses);
+            
+            if (sender === 'bot') {
+                messageElement.classList.add('rendered-markdown');
+                messageElement.innerHTML = marked.parse(text);
+            } else {
+                messageElement.innerHTML = `<p>${text.replace(/\n/g, '<br>')}</p>`;
+            }
+            
+            messageWrapper.appendChild(messageElement);
+            chatWindow.appendChild(messageWrapper);
             chatWindow.scrollTop = chatWindow.scrollHeight;
         }
 
         function updateStatus(text) { statusText.textContent = text; }
         
-        async function getBotResponse(query) {
+        async function callGroqAPI(payload) {
+            const headers = {
+                "Authorization": `Bearer ${GROQ_API_KEY}`,
+                "Content-Type": "application/json"
+            };
+            const response = await fetch(API_URL, { method: 'POST', headers: headers, body: JSON.stringify(payload) });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`API request failed: ${errorData.error.message}`);
+            }
+            const result = await response.json();
+            return result.choices[0].message.content;
+        }
+
+        async function getRegularBotResponse(query) {
             const lowerCaseQuery = query.toLowerCase();
-            
             for (const key in knowledgeBase) {
                 if (knowledgeBase[key].keywords.some(k => lowerCaseQuery.includes(k))) {
                     return knowledgeBase[key].jawaban;
                 }
             }
-
             updateStatus("Menghubungi AI super cepat...");
-            try {
-                const headers = {
-                    "Authorization": `Bearer ${GROQ_API_KEY}`,
-                    "Content-Type": "application/json"
-                };
-                
-                const payload = { 
-                    "model": "llama3-8b-8192",
-                    "messages": [
-                        {"role": "system", "content": "Anda adalah asisten AI dari kampus LP3I. Jawab pertanyaan dalam bahasa Indonesia dengan ramah dan informatif."},
-                        {"role": "user", "content": query}
-                    ]
-                };
+            
+            // **PERUBAHAN 2: Membangun payload dari riwayat chat**
+            const messages = [
+                {"role": "system", "content": "Anda adalah asisten AI dari kampus LP3I. Jawab pertanyaan dalam bahasa Indonesia dengan ramah dan informatif. Gunakan format Markdown jika perlu (misal: untuk daftar, teks tebal, atau tabel)."},
+                ...chatHistory, // Menyertakan pesan-pesan sebelumnya
+                {"role": "user", "content": query}
+            ];
 
-                const response = await fetch(API_URL, { method: 'POST', headers: headers, body: JSON.stringify(payload) });
-                
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`API request failed: ${errorData.error.message}`);
-                }
+            const payload = { 
+                "model": "llama3-8b-8192",
+                "messages": messages
+            };
+            return await callGroqAPI(payload);
+        }
 
-                const result = await response.json();
-                const cleanedText = result.choices[0].message.content;
-                return cleanedText || "Maaf, saya tidak bisa menghasilkan jawaban saat ini.";
+        async function getCareerPlan(major) {
+            updateStatus(`✨ Membuat rencana karir untuk ${major}...`);
+            const messages = [
+                { role: "system", content: "Anda adalah seorang konselor karir ahli untuk lulusan Politeknik LP3I. Buatkan daftar 3-4 prospek karir. Untuk setiap karir, jelaskan: 1. Deskripsi Singkat (1-2 kalimat). 2. Skill Utama (3 poin). **Gunakan format Markdown** (heading, bold, list)." },
+                ...chatHistory,
+                { role: "user", content: `Jurusan: "${major}"` }
+            ];
+            const payload = { model: "llama3-8b-8192", messages: messages };
+            return await callGroqAPI(payload);
+        }
 
-            } catch (error) {
-                console.error("Error calling Groq API:", error);
-                return "Maaf, terjadi kesalahan saat menghubungi AI. Coba lagi dalam beberapa saat.";
-            }
+        async function getMajorComparison(major1, major2) {
+            updateStatus(`⚖️ Membandingkan ${major1} dan ${major2}...`);
+            const messages = [
+                { role: "system", content: "Anda adalah analis pendidikan. Buat **tabel perbandingan dalam format Markdown** antara dua jurusan di LP3I. Kolom harus: 'Aspek', Jurusan 1, dan Jurusan 2. Baris harus: 'Fokus Utama', 'Prospek Karir', dan 'Tipe Mahasiswa Ideal'." },
+                ...chatHistory,
+                { role: "user", content: `Bandingkan antara "${major1}" dan "${major2}".` }
+            ];
+            const payload = { model: "llama3-8b-8192", messages: messages };
+            return await callGroqAPI(payload);
+        }
+
+        async function getInterviewQuestions(jobTitle) {
+            updateStatus(`🎙️ Membuat pertanyaan wawancara untuk ${jobTitle}...`);
+            const messages = [
+                { role: "system", content: "Anda adalah seorang HRD Manager. Buatkan daftar 5 pertanyaan wawancara yang paling sering ditanyakan untuk sebuah posisi, beserta tips singkat cara menjawabnya. **Gunakan format Markdown** (numbered list, bold)." },
+                ...chatHistory,
+                { role: "user", content: `Posisi: "${jobTitle}"` }
+            ];
+            const payload = { model: "llama3-8b-8192", messages: messages };
+            return await callGroqAPI(payload);
         }
         
         async function handleUserInput() {
@@ -136,17 +249,78 @@
             displayMessage(query, 'user');
             userInput.value = "";
             sendButton.disabled = true;
-
-            const botResponse = await getBotResponse(query);
             
-            updateStatus("");
-            displayMessage(botResponse, 'bot');
-            sendButton.disabled = false;
-            userInput.focus();
+            let botResponse = "";
+            const currentFeature = activeFeature;
+            activeFeature = null;
+
+            try {
+                switch (currentFeature) {
+                    case 'career':
+                        botResponse = await getCareerPlan(query);
+                        break;
+                    case 'compare_1':
+                        majorToCompare = query;
+                        activeFeature = 'compare_2';
+                        botResponse = `Baik, jurusan pertama adalah **${query}**. Sekarang, masukkan jurusan kedua yang ingin Anda bandingkan.`;
+                        break;
+                    case 'compare_2':
+                        botResponse = await getMajorComparison(majorToCompare, query);
+                        majorToCompare = '';
+                        break;
+                    case 'interview':
+                        botResponse = await getInterviewQuestions(query);
+                        break;
+                    default:
+                        botResponse = await getRegularBotResponse(query);
+                }
+            } catch (error) {
+                console.error("Error in handleUserInput:", error);
+                botResponse = "Maaf, terjadi kesalahan saat menghubungi AI. Coba lagi dalam beberapa saat.";
+            } finally {
+                if (activeFeature !== 'compare_2') {
+                    displayMessage(botResponse, 'bot');
+                    
+                    // **PERUBAHAN 3: Menyimpan percakapan ke riwayat**
+                    // Kita simpan teks mentah (bukan HTML) untuk konsistensi
+                    const rawBotResponse = botResponse.replace(/<[^>]*>/g, '').replace(/<br>/g, '\n');
+                    chatHistory.push({ role: 'user', content: query });
+                    chatHistory.push({ role: 'assistant', content: rawBotResponse });
+
+                    // Menjaga agar riwayat tidak terlalu panjang (menyimpan 6 interaksi terakhir)
+                    if (chatHistory.length > 12) {
+                        chatHistory = chatHistory.slice(-12);
+                    }
+                }
+                sendButton.disabled = false;
+                userInput.focus();
+                updateStatus("");
+            }
         }
 
         sendButton.addEventListener('click', handleUserInput);
         userInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleUserInput(); });
+
+        careerPlanButton.addEventListener('click', () => {
+            activeFeature = 'career';
+            displayMessage("Tentu! ✨ Jurusan apa yang Anda minati untuk saya buatkan rencana karirnya?", 'bot');
+            userInput.placeholder = "Ketik nama jurusan...";
+            userInput.focus();
+        });
+
+        compareMajorButton.addEventListener('click', () => {
+            activeFeature = 'compare_1';
+            displayMessage("Tentu! ⚖️ Masukkan nama jurusan pertama yang ingin dibandingkan.", 'bot');
+            userInput.placeholder = "Jurusan pertama, misal: Informatika Komputer";
+            userInput.focus();
+        });
+
+        interviewSimButton.addEventListener('click', () => {
+            activeFeature = 'interview';
+            displayMessage("Siap! 🎙️ Masukkan nama posisi pekerjaan untuk simulasi wawancara.", 'bot');
+            userInput.placeholder = "Posisi pekerjaan, misal: Digital Marketer";
+            userInput.focus();
+        });
 
         window.onload = () => {
             displayMessage("Halo! Saya AI LP3I, AI dengan respon super cepat. Silakan bertanya.", 'bot');
