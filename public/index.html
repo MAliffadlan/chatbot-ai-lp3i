@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI - Informasi Kampus LP3I (Versi Beta)</title>
+    <title>AI LP3I (Groq Edition)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Google tag (gtag.js) -->
+    <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-7DN6K1JQDG"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -21,7 +19,6 @@
         #chat-window::-webkit-scrollbar { width: 6px; }
         #chat-window::-webkit-scrollbar-track { background: #1f2937; }
         #chat-window::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
-        #chat-window::-webkit-scrollbar-thumb:hover { background: #6b7280; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
     </style>
@@ -32,7 +29,7 @@
         <div class="p-4 border-b border-gray-700 flex items-center space-x-4">
            <img src="static/lp3i1.png" alt="Logo LP3I" class="w-12 h-12 rounded-full object-cover border-2 border-purple-400 flex-shrink-0">
             <div>
-                <h1 class="text-xl font-bold">AI LP3I (Beta)</h1>
+                <h1 class="text-xl font-bold">AI LP3I</h1>
                 <p class="text-sm text-green-400 flex items-center">
                     <span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
                     Online
@@ -46,7 +43,7 @@
         <div class="p-4 border-t border-gray-700">
             <div class="flex items-center bg-gray-700 rounded-xl">
                 <input type="text" id="user-input" class="flex-1 bg-transparent p-4 focus:outline-none placeholder-gray-400" placeholder="Tanyakan sesuatu...">
-                <button id="send-button" class="bg-purple-600 text-white font-semibold rounded-lg p-3 m-2 hover:bg-purple-700 transition-all duration-200 disabled:bg-gray-500 disabled:cursor-not-allowed transform hover:scale-110 disabled:scale-100">
+                <button id="send-button" class="bg-purple-600 text-white font-semibold rounded-lg p-3 m-2 hover:bg-purple-700 transition-all duration-200 disabled:bg-gray-500">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
             </div>
@@ -59,33 +56,22 @@
         const sendButton = document.getElementById('send-button');
         const statusText = document.getElementById('status-text');
 
-        // ===================================================================
-        // LANGKAH PENTING: Masukkan Kunci API Hugging Face Anda di sini
-        // ===================================================================
-        // Ganti tulisan "hf_..." dengan token asli Anda dari Hugging Face.
-        // PERINGATAN: Ini membuat kunci Anda terlihat di browser.
-        // Hanya cocok untuk proyek portofolio, bukan untuk aplikasi produksi.
-      
-        // ===================================================================
+        // --- Konfigurasi API (PENTING!) ---
+        // Ganti dengan kunci API asli Anda dari Groq.
+        const GROQ_API_KEY = "GANTI_DENGAN_KUNCI_API_ANDA_NANTI_DI_NETLIFY";
+        
+        // Alamat API Groq
+        const API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
-       const HF_API_TOKEN = "MASUKKAN_TOKEN_HUGGING_FACE_ANDA_DI_SINI";
-
+        // --- Otak Lokal Chatbot ---
         const knowledgeBase = {
-            "jurusan_jakarta": { 
-                keywords: ["jurusan", "prodi", "program studi", "jakarta"], 
-                jawaban: "Politeknik LP3I Jakarta (PLJ) menawarkan program D3 dan Sarjana Terapan. \n\n**Program D3:**\n- Administrasi Perkantoran\n- Hubungan Masyarakat\n- Akuntansi Komputer\n- Manajemen Informatika\n\n**Program Sarjana Terapan:**\n- Administrasi Bisnis Internasional\n- Bisnis Digital\n- Logistik Perdagangan Internasional\n\nSemua program dirancang agar lulusannya kompeten dan siap kerja." 
-            },
             "pendaftaran": { 
                 keywords: ["daftar", "pendaftaran", "registrasi", "mendaftar"], 
-                jawaban: "Tentu, Anda bisa mendapatkan informasi pendaftaran terbaru dan melakukan pendaftaran online langsung di halaman PMB (Penerimaan Mahasiswa Baru) resmi Politeknik LP3I Jakarta. Silakan kunjungi: <a href='https://pmb.lp3ijkt.ac.id/' target='_blank' class='text-purple-400 hover:underline'>pmb.lp3ijkt.ac.id</a>" 
+                jawaban: "Anda bisa mendapatkan informasi pendaftaran terbaru dan mendaftar online di halaman PMB resmi Politeknik LP3I Jakarta: <a href='https://pmb.lp3ijkt.ac.id/' target='_blank' class='text-purple-400 hover:underline'>pmb.lp3ijkt.ac.id</a>" 
             },
-            "biaya": { 
-                keywords: ["biaya", "harga", "spp"], 
-                jawaban: "Informasi biaya kuliah sangat dinamis. Untuk mendapatkan rincian biaya yang paling akurat dan terbaru, Anda bisa langsung melihatnya di halaman pendaftaran resmi mereka di <a href='https://pmb.lp3ijkt.ac.id/' target='_blank' class='text-purple-400 hover:underline'>pmb.lp3ijkt.ac.id</a> atau menghubungi kontak admisi yang tertera di sana." 
-            },
-            "lokasi": { 
-                keywords: ["lokasi", "alamat", "kampus"], 
-                jawaban: "LP3I memiliki banyak cabang. Untuk Politeknik LP3I Jakarta, kampus utamanya berada di Menara Sentraya, Jl. Iskandarsyah Raya No.1A, Jakarta Selatan. Anda bisa melihat peta dan detail kontak lengkap di halaman kontak resmi mereka: <a href='https://lp3ijkt.ac.id/kontak/' target='_blank' class='text-purple-400 hover:underline'>lp3ijkt.ac.id/kontak/</a>" 
+             "creator": {
+                keywords: ["dibuat siapa", "siapa yang buat", "penciptamu", "siapa yg buat", "yg buat kamu"],
+                jawaban: "Saya adalah asisten AI yang dikembangkan oleh M Alif Fadlan."
             }
         };
         
@@ -105,37 +91,42 @@
         async function getBotResponse(query) {
             const lowerCaseQuery = query.toLowerCase();
             
-            // Cek di knowledge base dulu
             for (const key in knowledgeBase) {
                 if (knowledgeBase[key].keywords.some(k => lowerCaseQuery.includes(k))) {
                     return knowledgeBase[key].jawaban;
                 }
             }
 
-            // Jika tidak ada, panggil AI
-            updateStatus("Menghubungi AI...");
+            updateStatus("Menghubungi AI super cepat...");
             try {
-                const headers = {"Authorization": `Bearer ${HF_API_TOKEN}`};
-                const payload = { "inputs": `[INST] Jawab pertanyaan berikut sebagai asisten LP3I dalam bahasa Indonesia: ${query} [/INST]` };
+                const headers = {
+                    "Authorization": `Bearer ${GROQ_API_KEY}`,
+                    "Content-Type": "application/json"
+                };
+                
+                // Format payload untuk Groq API (standar OpenAI)
+                const payload = { 
+                    "model": "llama3-8b-8192", // Model yang sangat cepat
+                    "messages": [
+                        {"role": "system", "content": "Anda adalah asisten AI dari kampus LP3I. Jawab pertanyaan dalam bahasa Indonesia dengan ramah dan informatif."},
+                        {"role": "user", "content": query}
+                    ]
+                };
+
                 const response = await fetch(API_URL, { method: 'POST', headers: headers, body: JSON.stringify(payload) });
                 
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    if (errorText.includes("is currently loading")) {
-                        return "Model AI sedang disiapkan, coba lagi dalam 20 detik...";
-                    }
-                    throw new Error(`API request failed: ${errorText}`);
+                    const errorData = await response.json();
+                    throw new Error(`API request failed: ${errorData.error.message}`);
                 }
 
                 const result = await response.json();
-                const generatedText = result[0].get("generated_text", "");
-                const lastInstIndex = generatedText.lastIndexOf("[/INST]");
-                const cleanedText = generatedText.substring(lastInstIndex + 7).trim();
+                const cleanedText = result.choices[0].message.content;
                 return cleanedText || "Maaf, saya tidak bisa menghasilkan jawaban saat ini.";
 
             } catch (error) {
-                console.error("Error calling Hugging Face API:", error);
-                return "Maaf, terjadi kesalahan saat menghubungi AI.";
+                console.error("Error calling Groq API:", error);
+                return "Maaf, terjadi kesalahan saat menghubungi AI. Coba lagi dalam beberapa saat.";
             }
         }
         
@@ -159,7 +150,7 @@
         userInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleUserInput(); });
 
         window.onload = () => {
-            displayMessage("Halo! Saya AI LP3I. Silakan bertanya.", 'bot');
+            displayMessage("Halo! Saya AI LP3I, ditenagai oleh Groq untuk respons super cepat. Silakan bertanya.", 'bot');
             userInput.focus();
         };
     </script>
