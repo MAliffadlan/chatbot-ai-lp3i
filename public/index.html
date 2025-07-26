@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -61,12 +61,12 @@
         .rendered-markdown strong { color: #e5e7eb; }
     </style>
 </head>
-<body class="bg-gray-900 text-white flex flex-col items-center h-screen p-2 sm:p-4">
+<body class="bg-gray-900 text-white flex flex-col items-center h-full p-2 sm:p-4 overflow-hidden">
 
-  
+    <div class="w-full max-w-2xl h-full flex flex-col bg-gray-800 rounded-2xl shadow-2xl border border-gray-700 overflow-hidden">
         <div class="p-4 border-b border-gray-700 flex items-center space-x-4 flex-shrink-0">
            <img src="static/lp3i1.png" alt="Logo LP3I" class="w-12 h-12 rounded-full object-cover border-2 border-purple-400 flex-shrink-0">
-           
+           <div>
                 <h1 class="text-xl font-bold">LP3I AI (Beta)</h1>
                 <p class="text-sm text-green-400 flex items-center">
                     <span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
@@ -97,7 +97,7 @@
                         <button id="interview-sim-button">🎙️ Simulasi Wawancara</button>
                     </div>
                 </div>
-                <input type="text" id="user-input" class="flex-1 bg-transparent p-4 focus:outline-none placeholder-gray-400" placeholder="Tanyakan sesuatu atau pilih fitur AI...">
+                <input type="text" id="user-input" class="flex-1 bg-transparent p-4 focus:outline-none placeholder-gray-400" placeholder="Tanyakan atau pilih fitur AI...">
                 <button id="send-button" class="bg-purple-600 text-white font-semibold rounded-lg p-3 m-2 hover:bg-purple-700 transition-all duration-200 disabled:bg-gray-500">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
