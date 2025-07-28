@@ -83,15 +83,22 @@
 <body class="bg-gray-900 text-white flex flex-col items-center h-full p-2 sm:p-4 overflow-hidden">
     <canvas id="background-canvas"></canvas>
     <div class="w-full max-w-2xl h-full flex flex-col bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-700 overflow-hidden z-10">
-        <div class="p-4 border-b border-gray-700 flex items-center space-x-4 flex-shrink-0">
-           <img src="static/lp3i1.png" alt="Logo LP3I" class="w-12 h-12 rounded-full object-cover border-2 border-purple-400 flex-shrink-0">
-            <div>
-                <h1 class="text-xl font-bold">LP3I AI (Beta)</h1>
-                <p class="text-sm text-green-400 flex items-center">
-                    <span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
-                    Online
-                </p>
+       
+        <div class="p-4 border-b border-gray-700 flex items-center justify-between flex-shrink-0">
+            <div class="flex items-center space-x-4">
+                <img src="static/lp3i1.png" alt="Logo LP3I" class="w-12 h-12 rounded-full object-cover border-2 border-purple-400 flex-shrink-0">
+                <div>
+                    <h1 class="text-xl font-bold">LP3I AI (Beta)</h1>
+                    <p class="text-sm text-green-400 flex items-center">
+                        <span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+                        Online
+                    </p>
+                </div>
             </div>
+            <!-- PENAMBAHAN FITUR: Tombol Hapus Obrolan -->
+            <button id="clear-chat-button" type="button" title="Hapus Obrolan" class="text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 transition-colors">
+                <svg xmlns="http://www.w.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+            </button>
         </div>
 
         <div id="chat-window" class="flex-1 p-6 overflow-y-auto space-y-6"></div>
@@ -133,6 +140,9 @@
         const interviewSimButton = document.getElementById('interview-sim-button');
         const promptSuggestionsContainer = document.getElementById('prompt-suggestions-container');
         const majorQuizButton = document.getElementById('major-quiz-button');
+        // PENAMBAHAN FITUR: Mendapatkan elemen tombol hapus
+        const clearChatButton = document.getElementById('clear-chat-button');
+
         let activeFeature = null;
         let majorToCompare = '';
         let chatHistory = [];
@@ -146,10 +156,10 @@
         function updateStatus(text) { statusText.textContent = text; }
         async function callGroqAPI(payload, botMessageElement) { payload.stream = true; const headers = { "Authorization": `Bearer ${GROQ_API_KEY}`, "Content-Type": "application/json" }; const response = await fetch(API_URL, { method: 'POST', headers: headers, body: JSON.stringify(payload) }); if (!response.ok) { throw new Error(`API request failed`); } const reader = response.body.getReader(); const decoder = new TextDecoder(); let fullResponse = ""; while (true) { const { value, done } = await reader.read(); if (done) break; const chunk = decoder.decode(value); const lines = chunk.split('\n'); for (const line of lines) { if (line.startsWith('data: ')) { const data = line.substring(6); if (data.trim() === '[DONE]') return fullResponse; try { const parsed = JSON.parse(data); const content = parsed.choices[0]?.delta?.content || ""; if (content) { fullResponse += content; botMessageElement.innerHTML = marked.parse(fullResponse); chatWindow.scrollTop = chatWindow.scrollHeight; } } catch (e) {} } } } return fullResponse; }
         async function getRegularBotResponse(query, botMessageElement) { updateStatus("Menghubungi AI super cepat..."); const messages = [ {"role": "system", "content": "Anda adalah asisten AI dari kampus LP3I. Jawab pertanyaan dalam bahasa Indonesia dengan ramah dan informatif. Gunakan format Markdown jika perlu."}, ...chatHistory, {"role": "user", "content": query} ]; const payload = { "model": "llama3-8b-8192", "messages": messages }; return await callGroqAPI(payload, botMessageElement); }
-        async function getCareerPlan(query, botMessageElement) { updateStatus(`✨ Membuat rencana karir...`); const messages = [ { role: "system", content: "Anda adalah seorang konselor karir ahli. Buatkan daftar 3-4 prospek karir. Untuk setiap karir, jelaskan: 1. Deskripsi Singkat. 2. Skill Utama. Gunakan format Markdown." }, ...chatHistory, { role: "user", content: `Jurusan: "${query}"` } ]; const payload = { model: "llama3-8b-8192", messages: messages }; return await callGroqAPI(payload, botMessageElement); }
-        async function getMajorComparison(major1, major2, botMessageElement) { updateStatus(`⚖️ Membandingkan jurusan...`); const messages = [ { role: "system", content: "Anda adalah analis pendidikan. Buat tabel perbandingan Markdown antara dua jurusan. Kolom: 'Aspek', Jurusan 1, Jurusan 2. Baris: 'Fokus Utama', 'Prospek Karir', 'Tipe Mahasiswa Ideal'." }, ...chatHistory, { role: "user", content: `Bandingkan antara "${major1}" dan "${major2}".` } ]; const payload = { model: "llama3-8b-8192", messages: messages }; return await callGroqAPI(payload, botMessageElement); }
-        async function getInterviewQuestions(jobTitle, botMessageElement) { updateStatus(`🎙️ Membuat pertanyaan wawancara...`); const messages = [ { role: "system", content: "Anda adalah seorang HRD Manager. Buatkan daftar 5 pertanyaan wawancara untuk sebuah posisi, beserta tips singkat cara menjawabnya. Gunakan format Markdown." }, ...chatHistory, { role: "user", content: `Posisi: "${jobTitle}"` } ]; const payload = { model: "llama3-8b-8192", messages: messages }; return await callGroqAPI(payload, botMessageElement); }
-        async function getMajorRecommendation(botMessageElement) { updateStatus(`🧠 Menganalisis jawaban Anda...`); const compiledAnswers = `Jawaban 1 (Minat): ${quizState.answers[0]}. Jawaban 2 (Gaya Belajar): ${quizState.answers[1]}. Jawaban 3 (Tujuan Karir): ${quizState.answers[2]}.`; const messages = [ { role: "system", content: "Anda adalah konselor pendidikan ahli untuk LP3I. Berdasarkan jawaban kuis minat dari seorang calon mahasiswa, berikan rekomendasi 1-2 jurusan di LP3I yang paling cocok. Jelaskan alasannya secara personal dan meyakinkan. Jurusan yang tersedia: Administrasi Perkantoran, Hubungan Masyarakat, Akuntansi Komputer, Manajemen Informatika, Administrasi Bisnis Internasional, Bisnis Digital, Logistik Perdagangan Internasional." }, { role: "user", content: `Berikut adalah jawaban saya untuk kuis minat: "${compiledAnswers}". Berikan saya rekomendasi jurusan.` } ]; const payload = { model: "llama3-8b-8192", messages: messages }; return await callGroqAPI(payload, botMessageElement); }
+        async function getCareerPlan(query, botMessageElement) { updateStatus(`✨ Membuat rencana karir...`); const messages = [ { role: "system", content: "Anda adalah seorang konselor karir ahli. Buatkan daftar 3-4 prospek karir. Untuk setiap karir, jelaskan: 1. Deskripsi Singkat. 2. Skill Utama. Gunakan format Markdown." }, ...chatHistory, { role: "user", content: `Jurusan: "${query}"` } ]; const payload = { model: "llama3-8b-8192", "messages": messages }; return await callGroqAPI(payload, botMessageElement); }
+        async function getMajorComparison(major1, major2, botMessageElement) { updateStatus(`⚖️ Membandingkan jurusan...`); const messages = [ { role: "system", content: "Anda adalah analis pendidikan. Buat tabel perbandingan Markdown antara dua jurusan. Kolom: 'Aspek', Jurusan 1, Jurusan 2. Baris: 'Fokus Utama', 'Prospek Karir', 'Tipe Mahasiswa Ideal'." }, ...chatHistory, { role: "user", content: `Bandingkan antara "${major1}" dan "${major2}".` } ]; const payload = { model: "llama3-8b-8192", "messages": messages }; return await callGroqAPI(payload, botMessageElement); }
+        async function getInterviewQuestions(jobTitle, botMessageElement) { updateStatus(`🎙️ Membuat pertanyaan wawancara...`); const messages = [ { role: "system", content: "Anda adalah seorang HRD Manager. Buatkan daftar 5 pertanyaan wawancara untuk sebuah posisi, beserta tips singkat cara menjawabnya. Gunakan format Markdown." }, ...chatHistory, { role: "user", content: `Posisi: "${jobTitle}"` } ]; const payload = { model: "llama3-8b-8192", "messages": messages }; return await callGroqAPI(payload, botMessageElement); }
+        async function getMajorRecommendation(botMessageElement) { updateStatus(`🧠 Menganalisis jawaban Anda...`); const compiledAnswers = `Jawaban 1 (Minat): ${quizState.answers[0]}. Jawaban 2 (Gaya Belajar): ${quizState.answers[1]}. Jawaban 3 (Tujuan Karir): ${quizState.answers[2]}.`; const messages = [ { role: "system", content: "Anda adalah konselor pendidikan ahli untuk LP3I. Berdasarkan jawaban kuis minat dari seorang calon mahasiswa, berikan rekomendasi 1-2 jurusan di LP3I yang paling cocok. Jelaskan alasannya secara personal dan meyakinkan. Jurusan yang tersedia: Administrasi Perkantoran, Hubungan Masyarakat, Akuntansi Komputer, Manajemen Informatika, Administrasi Bisnis Internasional, Bisnis Digital, Logistik Perdagangan Internasional." }, { role: "user", content: `Berikut adalah jawaban saya untuk kuis minat: "${compiledAnswers}". Berikan saya rekomendasi jurusan.` } ]; const payload = { model: "llama3-8b-8192", "messages": messages }; return await callGroqAPI(payload, botMessageElement); }
         async function handleUserInput() { const query = userInput.value.trim(); if (query === "") return; promptSuggestionsContainer.style.display = 'none'; displayMessage(query, 'user'); userInput.value = ""; sendButton.disabled = true; if (quizState.active) { quizState.answers.push(query); quizState.currentQuestionIndex++; if (quizState.currentQuestionIndex < quizQuestions.length) { displayMessage(quizQuestions[quizState.currentQuestionIndex], 'bot'); sendButton.disabled = false; userInput.focus(); } else { quizState.active = false; const botMessageElement = displayMessage("", 'bot'); botMessageElement.innerHTML = `<div class="p-4 rendered-markdown"><span class="animate-pulse">...</span></div>`; const botResponse = await getMajorRecommendation(botMessageElement); chatHistory.push({ role: 'user', content: "Kuis Rekomendasi Jurusan dan jawabannya." }); chatHistory.push({ role: 'assistant', content: botResponse }); sendButton.disabled = false; userInput.placeholder = "Tanyakan sesuatu atau pilih fitur AI..."; userInput.focus(); updateStatus(""); } return; } const botMessageElement = displayMessage("", 'bot'); botMessageElement.innerHTML = `<div class="p-4 rendered-markdown"><span class="animate-pulse">...</span></div>`; let botResponse = ""; const currentFeature = activeFeature; activeFeature = null; try { const lowerCaseQuery = query.toLowerCase(); let foundInKB = false; for (const key in knowledgeBase) { if (knowledgeBase[key].keywords.some(k => lowerCaseQuery.includes(k))) { botResponse = knowledgeBase[key].jawaban; botMessageElement.innerHTML = `<div class="p-4 rendered-markdown">${marked.parse(botResponse)}</div>`; foundInKB = true; break; } } if (!foundInKB) { chatHistory.push({ role: 'user', content: query }); switch (currentFeature) { case 'career': botResponse = await getCareerPlan(query, botMessageElement); break; case 'compare_1': majorToCompare = query; activeFeature = 'compare_2'; botResponse = `Baik, jurusan pertama adalah **${query}**. Sekarang, masukkan jurusan kedua yang ingin Anda bandingkan.`; botMessageElement.innerHTML = `<div class="p-4 rendered-markdown">${marked.parse(botResponse)}</div>`; break; case 'compare_2': chatHistory.pop(); chatHistory.push({ role: 'user', content: `Bandingkan ${majorToCompare} dan ${query}` }); botResponse = await getMajorComparison(majorToCompare, query, botMessageElement); majorToCompare = ''; break; case 'interview': botResponse = await getInterviewQuestions(query, botMessageElement); break; default: botResponse = await getRegularBotResponse(query, botMessageElement); } } } catch (error) { console.error("Error in handleUserInput:", error); botResponse = "Maaf, terjadi kesalahan saat menghubungi AI."; botMessageElement.innerHTML = `<div class="p-4 rendered-markdown">${marked.parse(botResponse)}</div>`; } finally { if (activeFeature !== 'compare_2' && !quizState.active) { const rawBotResponse = botResponse.replace(/<[^>]*>/g, '').replace(/<br>/g, '\n'); chatHistory.push({ role: 'assistant', content: rawBotResponse }); if (chatHistory.length > 12) { chatHistory = chatHistory.slice(-12); } } sendButton.disabled = false; userInput.focus(); updateStatus(""); } }
         sendButton.addEventListener('click', handleUserInput);
         userInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleUserInput(); });
@@ -158,6 +168,15 @@
         interviewSimButton.addEventListener('click', () => { activeFeature = 'interview'; displayMessage("Siap! 🎙️ Masukkan nama posisi pekerjaan untuk simulasi wawancara.", 'bot'); userInput.placeholder = "Posisi pekerjaan, misal: Digital Marketer"; userInput.focus(); });
         majorQuizButton.addEventListener('click', () => { quizState = { active: true, currentQuestionIndex: 0, answers: [] }; chatHistory = []; chatWindow.innerHTML = ''; promptSuggestionsContainer.style.display = 'none'; displayMessage(quizQuestions[0], 'bot'); userInput.placeholder = "Ketik jawaban Anda..."; userInput.focus(); });
         
+        // PENAMBAHAN FITUR: Event listener untuk tombol hapus
+        clearChatButton.addEventListener('click', () => {
+            chatWindow.innerHTML = '';
+            chatHistory = [];
+            // Menampilkan kembali pesan selamat datang dan saran
+            displayMessage("Halo! Saya AI LP3I, AI dengan respon super cepat. Silakan bertanya.", 'bot');
+            showPromptSuggestions();
+        });
+
         const canvas = document.createElement('canvas');
         canvas.id = 'background-canvas';
         document.body.insertBefore(canvas, document.body.firstChild);
@@ -231,4 +250,4 @@
         });
     </script>
 </body>
-</ht
+</html>

@@ -12,26 +12,24 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-# URL API untuk model AI di Hugging Face.
-# Kita akan menggunakan model chat yang populer dan gratis.
+
 API_URL = "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta"
 
-# Ambil token rahasia dari environment variable
-# Di PythonAnywhere, ini akan diambil dari file WSGI
+
 HF_API_TOKEN = os.getenv("HF_API_TOKEN")
 
-# Fungsi untuk memanggil Hugging Face API
+
 def query_huggingface_api(payload):
     headers = {"Authorization": f"Bearer {HF_API_TOKEN}"}
     response = requests.post(API_URL, headers=headers, json=payload)
     return response.json()
 
-# Route untuk halaman utama (hanya untuk penanda)
+
 @app.route('/')
 def index():
     return "<h1>Backend AI LP3I (Hugging Face) Aktif</h1>"
 
-# Route utama untuk API
+
 @app.route('/api/generate', methods=['POST'])
 def api_generate():
     if not HF_API_TOKEN:
@@ -63,7 +61,7 @@ def api_generate():
 
         return jsonify({"text": cleaned_text or "Maaf, saya tidak bisa menghasilkan jawaban saat ini."})
 
-    except Exception as e:
+    except Exception as e: 
         print(f"Error internal: {e}")
         return jsonify({"error": str(e)}), 500
 
