@@ -148,13 +148,50 @@
         let chatHistory = [];
         let quizState = { active: false, currentQuestionIndex: 0, answers: [] };
         const quizQuestions = [ "Halo! Saya akan bantu kamu menemukan jurusan yang cocok. Pertama, dari dua pilihan ini, mana yang lebih kamu sukai: bekerja dengan **angka dan data**, atau bekerja dengan **orang dan komunikasi**?", "Oke, selanjutnya. Apakah kamu lebih suka **memecahkan masalah teknis** (seperti coding atau memperbaiki sesuatu), atau lebih suka **merancang sesuatu yang kreatif** (seperti acara atau desain)?", "Terakhir, apa impian karirmu? Apakah kamu ingin menjadi seorang **manajer di perusahaan**, seorang **ahli teknologi**, atau seorang **pengusaha**?" ];
-        const GROQ_API_KEY = "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";
-        const API_URL = "https://api.groq.com/openai/v1/chat/completions";
+        const API_URL = "/.netlify/functions/groq-proxy";
+ 
         const knowledgeBase = { "jurusan_jakarta": { keywords: ["jurusan", "prodi", "program studi", "jakarta"], jawaban: "Politeknik LP3I Jakarta (PLJ) menawarkan program D3 dan Sarjana Terapan. \n\n**Program D3:**\n- Administrasi Perkantoran\n- Hubungan Masyarakat\n- Akuntansi Komputer\n- Manajemen Informatika\n\n**Program Sarjana Terapan:**\n- Administrasi Bisnis Internasional\n- Bisnis Digital\n- Logistik Perdagangan Internasional\n\nSemua program dirancang agar lulusannya kompeten dan siap kerja." }, "pendaftaran": { keywords: ["daftar", "pendaftaran", "registrasi", "mendaftar"], jawaban: "Anda bisa mendapatkan informasi pendaftaran terbaru dan mendaftar online di halaman PMB resmi Politeknik LP3I Jakarta: <a href='https://pmb.lp3i.ac.id/' target='_blank' class='text-purple-400 hover:underline'>pmb.lp3i.ac.id/</a>" }, "biaya": { keywords: ["biaya", "harga", "spp"], jawaban: "Informasi biaya kuliah sangat dinamis. Untuk mendapatkan rincian biaya yang paling akurat dan terbaru, Anda bisa langsung melihatnya di halaman pendaftaran resmi mereka di <a href='https://pmb.lp3i.ac.id/' target='_blank' class='text-purple-400 hover:underline'>pmb.lp3ijkt.ac.id</a> atau menghubungi kontak admisi yang tertera di sana." }, "lokasi": { keywords: ["lokasi", "alamat", "kampus"], jawaban: "LP3I memiliki banyak cabang. Untuk Politeknik LP3I Jakarta, kampus utamanya berada di Menara Sentraya, Jl. Iskandarsyah Raya No.1A, Jakarta Selatan. Anda bisa melihat peta dan detail kontak lengkap di halaman kontak resmi mereka: <a href='https://lp3ijkt.ac.id/lokasi-kampus-lp3i/' target='_blank' class='text-purple-400 hover:underline'>lp3ijkt.ac.id/lokasi-kampus-lp3i/</a>" }, "creator": { keywords: ["dibuat siapa", "siapa yang buat", "penciptamu", "siapa yg buat", "yg buat kamu","dibuat sama siapa"], jawaban: "Saya adalah asisten AI yang dikembangkan dan di program oleh M Alif Fadlan." } };
         function displayMessage(text, sender) { const messageWrapper = document.createElement('div'); messageWrapper.classList.add('flex', 'flex-col', 'max-w-xl', 'animate-fade-in-up'); let bubbleClass; if (sender === 'user') { messageWrapper.classList.add('self-end', 'items-end'); bubbleClass = 'bg-purple-600 text-white rounded-t-xl rounded-l-xl'; } else { messageWrapper.classList.add('self-start', 'items-start'); bubbleClass = 'bg-gray-700 text-white rounded-t-xl rounded-r-xl'; } const messageElement = document.createElement('div'); const bubbleClasses = bubbleClass.split(' '); messageElement.classList.add('p-4', 'shadow-md', ...bubbleClasses); if (sender === 'bot') { messageElement.classList.add('rendered-markdown'); messageElement.innerHTML = marked.parse(text); } else { messageElement.innerHTML = `<p>${text.replace(/\n/g, '<br>')}</p>`; } messageWrapper.appendChild(messageElement); chatWindow.appendChild(messageWrapper); chatWindow.scrollTop = chatWindow.scrollHeight; return messageElement; }
         function showPromptSuggestions() { const suggestionsContainer = document.getElementById('prompt-suggestions'); if (!suggestionsContainer) return; suggestionsContainer.innerHTML = ''; const suggestions = ["Jurusan apa saja yang ada?", "Berapa biaya pendaftaran?", "Bantu saya rencanakan karir"]; suggestions.forEach(prompt => { const button = document.createElement('button'); button.classList.add('bg-gray-700', 'p-2', 'rounded-lg', 'text-left', 'hover:bg-gray-600', 'transition-colors', 'text-sm', 'border', 'border-gray-600'); button.textContent = prompt; button.onclick = () => { userInput.value = prompt; handleUserInput(); }; suggestionsContainer.appendChild(button); }); promptSuggestionsContainer.style.display = 'flex'; }
         function updateStatus(text) { statusText.textContent = text; }
-        async function callGroqAPI(payload, botMessageElement) { payload.stream = true; const headers = { "Authorization": `Bearer ${GROQ_API_KEY}`, "Content-Type": "application/json" }; const response = await fetch(API_URL, { method: 'POST', headers: headers, body: JSON.stringify(payload) }); if (!response.ok) { throw new Error(`API request failed`); } const reader = response.body.getReader(); const decoder = new TextDecoder(); let fullResponse = ""; while (true) { const { value, done } = await reader.read(); if (done) break; const chunk = decoder.decode(value); const lines = chunk.split('\n'); for (const line of lines) { if (line.startsWith('data: ')) { const data = line.substring(6); if (data.trim() === '[DONE]') return fullResponse; try { const parsed = JSON.parse(data); const content = parsed.choices[0]?.delta?.content || ""; if (content) { fullResponse += content; botMessageElement.innerHTML = marked.parse(fullResponse); chatWindow.scrollTop = chatWindow.scrollHeight; } } catch (e) {} } } } return fullResponse; }
+       // Ganti fungsi callGroqAPI Anda dengan yang ini
+async function callGroqAPI(payload, botMessageElement) {
+    payload.stream = true;
+    // Header Authorization sudah tidak diperlukan di sini
+    const headers = { "Content-Type": "application/json" }; 
+    const response = await fetch(API_URL, { 
+        method: 'POST', 
+        headers: headers, 
+        body: JSON.stringify(payload) 
+    });
+
+    if (!response.ok) { throw new Error(`API request failed`); }
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let fullResponse = "";
+    while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+        for (const line of lines) {
+            if (line.startsWith('data: ')) {
+                const data = line.substring(6);
+                if (data.trim() === '[DONE]') return fullResponse;
+                try {
+                    const parsed = JSON.parse(data);
+                    const content = parsed.choices[0]?.delta?.content || "";
+                    if (content) {
+                        fullResponse += content;
+                        botMessageElement.innerHTML = marked.parse(fullResponse);
+                        chatWindow.scrollTop = chatWindow.scrollHeight;
+                    }
+                } catch (e) {}
+            }
+        }
+    }
+    return fullResponse;
+}
         async function getRegularBotResponse(query, botMessageElement) { updateStatus("Menghubungi AI super cepat..."); const messages = [ {"role": "system", "content": "Anda adalah asisten AI dari kampus LP3I. Jawab pertanyaan dalam bahasa Indonesia dengan ramah dan informatif. Gunakan format Markdown jika perlu."}, ...chatHistory, {"role": "user", "content": query} ]; const payload = { "model": "llama3-8b-8192", "messages": messages }; return await callGroqAPI(payload, botMessageElement); }
         async function getCareerPlan(query, botMessageElement) { updateStatus(`✨ Membuat rencana karir...`); const messages = [ { role: "system", content: "Anda adalah seorang konselor karir ahli. Buatkan daftar 3-4 prospek karir. Untuk setiap karir, jelaskan: 1. Deskripsi Singkat. 2. Skill Utama. Gunakan format Markdown." }, ...chatHistory, { role: "user", content: `Jurusan: "${query}"` } ]; const payload = { model: "llama3-8b-8192", "messages": messages }; return await callGroqAPI(payload, botMessageElement); }
         async function getMajorComparison(major1, major2, botMessageElement) { updateStatus(`⚖️ Membandingkan jurusan...`); const messages = [ { role: "system", content: "Anda adalah analis pendidikan. Buat tabel perbandingan Markdown antara dua jurusan. Kolom: 'Aspek', Jurusan 1, Jurusan 2. Baris: 'Fokus Utama', 'Prospek Karir', 'Tipe Mahasiswa Ideal'." }, ...chatHistory, { role: "user", content: `Bandingkan antara "${major1}" dan "${major2}".` } ]; const payload = { model: "llama3-8b-8192", "messages": messages }; return await callGroqAPI(payload, botMessageElement); }
