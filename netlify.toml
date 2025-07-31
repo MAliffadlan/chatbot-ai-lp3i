@@ -1,2 +1,10 @@
+ publish = "public"
+
+# Konfigurasi untuk saat di-upload ONLINE
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+# Konfigurasi untuk functions
 [functions]
   directory = "netlify/functions"

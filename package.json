@@ -1,0 +1,7 @@
+{
+  "name": "lp3i-chatbot",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "netlify dev"
+  }
+}
