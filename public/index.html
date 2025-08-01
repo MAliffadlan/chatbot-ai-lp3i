@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="id" class="h-full">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LP3I AI - Informasi Seputar Kampus LP3I (Beta)</title>
     <meta property="og:image" content="https://lp3iai.netlify.app/asset/background.jpg" />
     <meta property="og:title" content="LP3I AI - Asisten Informasi Kampus (Beta)" />
@@ -11,300 +11,651 @@
     <meta property="og:type" content="website" />
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-7DN6K1JQDG"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-7DN6K1JQDG');
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-7DN6K1JQDG");
     </script>
     <style>
-        
-        #background-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0; 
-        }
-        
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #030712; 
-        }
-        #chat-window::-webkit-scrollbar { width: 6px; }
-        #chat-window::-webkit-scrollbar-track { background: #1f2937; }
-        #chat-window::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
-        
-        .dropdown { position: relative; display: inline-block; }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            bottom: 100%;
-            left: 0;
-            background-color: #374151;
-            min-width: 200px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 10;
-            border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-        .dropdown-content button {
-            color: white;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            width: 100%;
-            text-align: left;
-            background: none;
-            border: none;
-        }
-        .dropdown-content button:hover { background-color: #4b5563; }
-        .dropdown:hover .dropdown-content { display: block; }
+      #background-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+      }
 
-        .rendered-markdown h1, .rendered-markdown h2, .rendered-markdown h3 { margin-top: 1rem; margin-bottom: 0.5rem; font-weight: 600; border-bottom: 1px solid #4b5563; padding-bottom: 0.25rem;}
-        .rendered-markdown ul { list-style-type: disc; margin-left: 1.5rem; }
-        .rendered-markdown ol { list-style-type: decimal; margin-left: 1.5rem; }
-        .rendered-markdown li { margin-bottom: 0.25rem; }
-        .rendered-markdown p:not(:last-child) { margin-bottom: 0.5rem; }
-        .rendered-markdown table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
-        .rendered-markdown th, .rendered-markdown td { border: 1px solid #4b5563; padding: 0.5rem 0.75rem; }
-        .rendered-markdown th { background-color: #374151; }
-        .rendered-markdown a { color: #a78bfa; text-decoration: underline; }
-        .rendered-markdown strong { color: #e5e7eb; }
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #030712;
+      }
+      #chat-window::-webkit-scrollbar {
+        width: 6px;
+      }
+      #chat-window::-webkit-scrollbar-track {
+        background: #1f2937;
+      }
+      #chat-window::-webkit-scrollbar-thumb {
+        background: #4b5563;
+        border-radius: 3px;
+      }
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .animate-fade-in-up {
+        animation: fadeInUp 0.5s ease-out forwards;
+      }
+
+      .dropdown {
+        position: relative;
+        display: inline-block;
+      }
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        bottom: 100%;
+        left: 0;
+        background-color: #374151;
+        min-width: 200px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 10;
+        border-radius: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+      .dropdown-content button {
+        color: white;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        width: 100%;
+        text-align: left;
+        background: none;
+        border: none;
+      }
+      .dropdown-content button:hover {
+        background-color: #4b5563;
+      }
+      .dropdown:hover .dropdown-content {
+        display: block;
+      }
+
+      .rendered-markdown h1,
+      .rendered-markdown h2,
+      .rendered-markdown h3 {
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        border-bottom: 1px solid #4b5563;
+        padding-bottom: 0.25rem;
+      }
+      .rendered-markdown ul {
+        list-style-type: disc;
+        margin-left: 1.5rem;
+      }
+      .rendered-markdown ol {
+        list-style-type: decimal;
+        margin-left: 1.5rem;
+      }
+      .rendered-markdown li {
+        margin-bottom: 0.25rem;
+      }
+      .rendered-markdown p:not(:last-child) {
+        margin-bottom: 0.5rem;
+      }
+      .rendered-markdown table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 1rem;
+      }
+      .rendered-markdown th,
+      .rendered-markdown td {
+        border: 1px solid #4b5563;
+        padding: 0.5rem 0.75rem;
+      }
+      .rendered-markdown th {
+        background-color: #374151;
+      }
+      .rendered-markdown a {
+        color: #a78bfa;
+        text-decoration: underline;
+      }
+      .rendered-markdown strong {
+        color: #e5e7eb;
+      }
     </style>
-</head>
-<body class="bg-gray-900 text-white flex flex-col items-center h-full p-2 sm:p-4 overflow-hidden">
+  </head>
+  <body class="bg-gray-900 text-white flex flex-col items-center h-full p-2 sm:p-4 overflow-hidden">
     <canvas id="background-canvas"></canvas>
     <div class="w-full max-w-2xl h-full flex flex-col bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-700 overflow-hidden z-10">
-        
-        <div class="p-4 border-b border-gray-700 flex items-center justify-between flex-shrink-0">
-            <div class="flex items-center space-x-4">
-                <img src="static/lp3i1.png" alt="Logo LP3I" class="w-12 h-12 rounded-full object-cover border-2 border-purple-400 flex-shrink-0">
-                <div>
-                    <h1 class="text-xl font-bold">LP3I AI (Beta)</h1>
-                    <p class="text-sm text-green-400 flex items-center">
-                        <span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
-                        Online
-                    </p>
-                </div>
-            </div>
-            <button id="clear-chat-button" type="button" title="Hapus Obrolan" class="text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+      <div class="p-4 border-b border-gray-700 flex items-center justify-between flex-shrink-0">
+        <div class="flex items-center space-x-4">
+          <img src="static/lp3i1.png" alt="Logo LP3I" class="w-12 h-12 rounded-full object-cover border-2 border-purple-400 flex-shrink-0" />
+          <div>
+            <h1 class="text-xl font-bold">LP3I AI (Beta)</h1>
+            <p class="text-sm text-green-400 flex items-center">
+              <span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+              Online
+            </p>
+          </div>
+        </div>
+        <button id="clear-chat-button" type="button" title="Hapus Obrolan" class="text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div id="chat-window" class="flex-1 p-6 overflow-y-auto space-y-6"></div>
+      <div id="status-indicator" class="px-6 pb-2 h-6 flex-shrink-0"><p id="status-text" class="text-sm text-gray-400"></p></div>
+
+      <div id="prompt-suggestions-container" class="px-4 pb-2 flex-shrink-0">
+        <div id="prompt-suggestions" class="flex flex-wrap justify-center gap-2"></div>
+      </div>
+
+      <div class="p-4 border-t border-gray-700 flex-shrink-0">
+        <div class="flex items-center bg-gray-700 rounded-xl">
+          <div class="dropdown">
+            <button id="ai-features-button" title="✨ Fitur AI" class="text-white font-semibold rounded-lg p-3 m-1 hover:bg-purple-600 transition-colors duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sparkles">
+                <path d="M12 3L14.34 8.66L20 11L14.34 13.34L12 19L9.66 13.34L4 11L9.66 8.66L12 3z" />
+                <path d="M20 3L18.5 6.5L15 8L18.5 9.5L20 13L21.5 9.5L25 8L21.5 6.5L20 3z" />
+                <path d="M8 3L6.5 6.5L3 8L6.5 9.5L8 13L9.5 9.5L13 8L9.5 6.5L8 3z" />
+              </svg>
             </button>
-        </div>
-
-        <div id="chat-window" class="flex-1 p-6 overflow-y-auto space-y-6"></div>
-        <div id="status-indicator" class="px-6 pb-2 h-6 flex-shrink-0"><p id="status-text" class="text-sm text-gray-400"></p></div>
-
-        <div id="prompt-suggestions-container" class="px-4 pb-2 flex-shrink-0">
-            <div id="prompt-suggestions" class="flex flex-wrap justify-center gap-2">
+            <div id="dropdown-menu" class="dropdown-content animate-fade-in-up">
+              <button id="major-quiz-button">🧠 Rekomendasi Jurusan</button>
+              <button id="career-plan-button">✨ Perencana Karir</button>
+              <button id="compare-major-button">⚖️ Komparasi Jurusan</button>
+              <button id="interview-sim-button">🎙️ Simulasi Wawancara</button>
+              <button id="faq-button">❓Info LP3I Ciputat</button>
             </div>
+          </div>
+          <input type="text" id="user-input" class="flex-1 bg-transparent p-4 focus:outline-none placeholder-gray-400" placeholder="Tanya atau pilih fitur AI..." />
+          <button id="send-button" class="bg-purple-600 text-white font-semibold rounded-lg p-3 m-2 hover:bg-purple-700 transition-all duration-200 disabled:bg-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
         </div>
-
-        <div class="p-4 border-t border-gray-700 flex-shrink-0">
-            <div class="flex items-center bg-gray-700 rounded-xl">
-                <div class="dropdown">
-                    <button id="ai-features-button" title="✨ Fitur AI" class="text-white font-semibold rounded-lg p-3 m-1 hover:bg-purple-600 transition-colors duration-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sparkles"><path d="M12 3L14.34 8.66L20 11L14.34 13.34L12 19L9.66 13.34L4 11L9.66 8.66L12 3z"/><path d="M20 3L18.5 6.5L15 8L18.5 9.5L20 13L21.5 9.5L25 8L21.5 6.5L20 3z"/><path d="M8 3L6.5 6.5L3 8L6.5 9.5L8 13L9.5 9.5L13 8L9.5 6.5L8 3z"/></svg>
-                    </button>
-                    <div id="dropdown-menu" class="dropdown-content animate-fade-in-up">
-                        <button id="major-quiz-button">🧠 Rekomendasi Jurusan</button>
-                        <button id="career-plan-button">✨ Perencana Karir</button>
-                        <button id="compare-major-button">⚖️ Komparasi Jurusan</button>
-                        <button id="interview-sim-button">🎙️ Simulasi Wawancara</button>
-                    </div>
-                </div>
-                <input type="text" id="user-input" class="flex-1 bg-transparent p-4 focus:outline-none placeholder-gray-400" placeholder="Tanya atau pilih fitur AI...">
-                <button id="send-button" class="bg-purple-600 text-white font-semibold rounded-lg p-3 m-2 hover:bg-purple-700 transition-all duration-200 disabled:bg-gray-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                </button>
-            </div>
-        </div>
+      </div>
     </div>
 
     <script>
-        const chatWindow = document.getElementById('chat-window');
-        const userInput = document.getElementById('user-input');
-        const sendButton = document.getElementById('send-button');
-        const statusText = document.getElementById('status-text');
-        const careerPlanButton = document.getElementById('career-plan-button');
-        const compareMajorButton = document.getElementById('compare-major-button');
-        const interviewSimButton = document.getElementById('interview-sim-button');
-        const promptSuggestionsContainer = document.getElementById('prompt-suggestions-container');
-        const majorQuizButton = document.getElementById('major-quiz-button');
-        const clearChatButton = document.getElementById('clear-chat-button');
+      const chatWindow = document.getElementById("chat-window");
+      const userInput = document.getElementById("user-input");
+      const sendButton = document.getElementById("send-button");
+      const statusText = document.getElementById("status-text");
+      const careerPlanButton = document.getElementById("career-plan-button");
+      const compareMajorButton = document.getElementById("compare-major-button");
+      const interviewSimButton = document.getElementById("interview-sim-button");
+      const promptSuggestionsContainer = document.getElementById("prompt-suggestions-container");
+      const majorQuizButton = document.getElementById("major-quiz-button");
+      const clearChatButton = document.getElementById("clear-chat-button");
+      const faqButton = document.getElementById("faq-button");
 
-        let activeFeature = null;
-        let majorToCompare = '';
-        let chatHistory = [];
-        let quizState = { active: false, currentQuestionIndex: 0, answers: [] };
-        const quizQuestions = [ "Halo! Saya akan bantu kamu menemukan jurusan yang cocok. Pertama, dari dua pilihan ini, mana yang lebih kamu sukai: bekerja dengan **angka dan data**, atau bekerja dengan **orang dan komunikasi**?", "Oke, selanjutnya. Apakah kamu lebih suka **memecahkan masalah teknis** (seperti coding atau memperbaiki sesuatu), atau lebih suka **merancang sesuatu yang kreatif** (seperti acara atau desain)?", "Terakhir, apa impian karirmu? Apakah kamu ingin menjadi seorang **manajer di perusahaan**, seorang **ahli teknologi**, atau seorang **pengusaha**?" ];
-        
-        // ===================================================================================
-        // == LANGKAH 3: PASTE KUNCI API YANG SUDAH DI-ENCODE DI SINI ==
-        // ===================================================================================
-        const ENCODED_API_KEY = "Z3NrX2M2c1kyRFNQV041dzM2Mk12YmlHV0dkeWIzRllhbHVwT1hXcG5pOHZ3YVBBb1dBTU5IZHA=";
-        // ===================================================================================
+      let activeFeature = null;
+      let majorToCompare = "";
+      let chatHistory = [];
+      let quizState = { active: false, currentQuestionIndex: 0, answers: [] };
+      let promptCount = 0;
+      const quizQuestions = [
+        "Halo! Saya akan bantu kamu menemukan jurusan yang cocok. Pertama, dari dua pilihan ini, mana yang lebih kamu sukai: bekerja dengan **angka dan data**, atau bekerja dengan **orang dan komunikasi**?",
+        "Oke, selanjutnya. Apakah kamu lebih suka **memecahkan masalah teknis** (seperti coding atau memperbaiki sesuatu), atau lebih suka **merancang sesuatu yang kreatif** (seperti acara atau desain)?",
+        "Terakhir, apa impian karirmu? Apakah kamu ingin menjadi seorang **manajer di perusahaan**, seorang **ahli teknologi**, atau seorang **pengusaha**?",
+      ];
+      const ENCODED_API_KEY = "Z3NrX2M2c1kyRFNQV041dzM2Mk12YmlHV0dkeWIzRllhbHVwT1hXcG5pOHZ3YVBBb1dBTU5IZHA=";
+      const API_URL = "https://api.groq.com/openai/v1/chat/completions";
+      const knowledgeBase = {
+        jurusan_jakarta: {
+          keywords: ["jurusan", "prodi", "program studi", "jakarta"],
+          jawaban:
+            "Politeknik LP3I Jakarta (PLJ) menawarkan program D3 dan Sarjana Terapan. \n\n**Program D3:**\n- Administrasi Perkantoran\n- Hubungan Masyarakat\n- Akuntansi Komputer\n- Manajemen Informatika\n\n**Program Sarjana Terapan:**\n- Administrasi Bisnis Internasional\n- Bisnis Digital\n- Logistik Perdagangan Internasional\n\nSemua program dirancang agar lulusannya kompeten dan siap kerja.",
+        },
+        pendaftaran: {
+          keywords: ["daftar", "pendaftaran", "registrasi", "mendaftar"],
+          jawaban:
+            "Anda bisa mendapatkan informasi pendaftaran terbaru dan mendaftar online di halaman PMB resmi Politeknik LP3I Jakarta: <a href='https://pmb.lp3i.ac.id/' target='_blank' class='text-purple-400 hover:underline'>pmb.lp3i.ac.id/</a>",
+        },
+        biaya: {
+          keywords: ["biaya", "harga", "spp"],
+          jawaban:
+            "Informasi biaya kuliah sangat dinamis. Untuk mendapatkan rincian biaya yang paling akurat dan terbaru, Anda bisa langsung melihatnya di halaman pendaftaran resmi mereka di <a href='https://pmb.lp3ijkt.ac.id/' target='_blank' class='text-purple-400 hover:underline'>pmb.lp3ijkt.ac.id</a> atau menghubungi kontak admisi yang tertera di sana.",
+        },
+        lokasi: {
+          keywords: ["lokasi", "alamat", "kampus"],
+          jawaban:
+            "LP3I memiliki banyak cabang. Untuk Politeknik LP3I Jakarta, kampus utamanya berada di Menara Sentraya, Jl. Iskandarsyah Raya No.1A, Jakarta Selatan. Anda bisa melihat peta dan detail kontak lengkap di halaman kontak resmi mereka: <a href='https://lp3ijkt.ac.id/lokasi-kampus-lp3i/' target='_blank' class='text-purple-400 hover:underline'>lp3ijkt.ac.id/lokasi-kampus-lp3i/</a>",
+        },
+        creator: { keywords: ["dibuat siapa", "siapa yang buat", "penciptamu", "siapa yg buat", "yg buat kamu", "dibuat sama siapa"], jawaban: "Saya adalah asisten AI yang dikembangkan dan di program oleh M Alif Fadlan." },
+        jadwal_kuliah: {
+          keywords: ["jadwal kuliah", "jadwal", "waktu kuliah", "jam kuliah"],
+          jawaban:
+            "Jadwal kuliah di LP3I Jakarta bervariasi tergantung program dan semester. Biasanya, kuliah diadakan pada pagi (08:00-12:00), siang (13:00-17:00), atau malam (18:00-21:00) hari Senin hingga Jumat, dengan opsi Sabtu untuk kelas tambahan. Untuk jadwal spesifik, silakan cek di <a href='https://lp3ijkt.ac.id/jadwal-kuliah/' target='_blank' class='text-purple-400 hover:underline'>lp3ijkt.ac.id/jadwal-kuliah/</a> atau hubungi bagian akademik.",
+        },
+        beasiswa: {
+          keywords: ["beasiswa", "bantuan biaya", "dana pendidikan"],
+          jawaban:
+            "LP3I menawarkan berbagai beasiswa untuk mahasiswa berprestasi atau yang membutuhkan bantuan finansial. Informasi lengkap tentang syarat dan pendaftaran bisa ditemukan di <a href='https://lp3ijkt.ac.id/beasiswa/' target='_blank' class='text-purple-400 hover:underline'>lp3ijkt.ac.id/beasiswa/</a> atau dengan menghubungi kantor administrasi kampus.",
+        },
+        proses_magang: {
+          keywords: ["magang", "internship", "praktik kerja", "magang kerja"],
+          jawaban:
+            "Proses magang di LP3I mencakup persiapan oleh dosen pembimbing, penempatan di perusahaan mitra, dan evaluasi hasil. Mahasiswa biasanya mengikuti magang pada semester akhir. Detail lebih lanjut tersedia di <a href='https://lp3ijkt.ac.id/magang/' target='_blank' class='text-purple-400 hover:underline'>lp3ijkt.ac.id/magang/</a> atau konsultasi dengan koordinator magang.",
+        },
+      };
 
-        const API_URL = "https://api.groq.com/openai/v1/chat/completions";
-        const knowledgeBase = { "jurusan_jakarta": { keywords: ["jurusan", "prodi", "program studi", "jakarta"], jawaban: "Politeknik LP3I Jakarta (PLJ) menawarkan program D3 dan Sarjana Terapan. \n\n**Program D3:**\n- Administrasi Perkantoran\n- Hubungan Masyarakat\n- Akuntansi Komputer\n- Manajemen Informatika\n\n**Program Sarjana Terapan:**\n- Administrasi Bisnis Internasional\n- Bisnis Digital\n- Logistik Perdagangan Internasional\n\nSemua program dirancang agar lulusannya kompeten dan siap kerja." }, "pendaftaran": { keywords: ["daftar", "pendaftaran", "registrasi", "mendaftar"], jawaban: "Anda bisa mendapatkan informasi pendaftaran terbaru dan mendaftar online di halaman PMB resmi Politeknik LP3I Jakarta: <a href='https://pmb.lp3i.ac.id/' target='_blank' class='text-purple-400 hover:underline'>pmb.lp3i.ac.id/</a>" }, "biaya": { keywords: ["biaya", "harga", "spp"], jawaban: "Informasi biaya kuliah sangat dinamis. Untuk mendapatkan rincian biaya yang paling akurat dan terbaru, Anda bisa langsung melihatnya di halaman pendaftaran resmi mereka di <a href='https://pmb.lp3ijkt.ac.id/' target='_blank' class='text-purple-400 hover:underline'>pmb.lp3ijkt.ac.id</a> atau menghubungi kontak admisi yang tertera di sana." }, "lokasi": { keywords: ["lokasi", "alamat", "kampus"], jawaban: "LP3I memiliki banyak cabang. Untuk Politeknik LP3I Jakarta, kampus utamanya berada di Menara Sentraya, Jl. Iskandarsyah Raya No.1A, Jakarta Selatan. Anda bisa melihat peta dan detail kontak lengkap di halaman kontak resmi mereka: <a href='https://lp3ijkt.ac.id/lokasi-kampus-lp3i/' target='_blank' class='text-purple-400 hover:underline'>lp3ijkt.ac.id/lokasi-kampus-lp3i/</a>" }, "creator": { keywords: ["dibuat siapa", "siapa yang buat", "penciptamu", "siapa yg buat", "yg buat kamu","dibuat sama siapa"], jawaban: "Saya adalah asisten AI yang dikembangkan dan di program oleh M Alif Fadlan." } };
-        
-        function displayMessage(text, sender) { const messageWrapper = document.createElement('div'); messageWrapper.classList.add('flex', 'flex-col', 'max-w-xl', 'animate-fade-in-up'); let bubbleClass; if (sender === 'user') { messageWrapper.classList.add('self-end', 'items-end'); bubbleClass = 'bg-purple-600 text-white rounded-t-xl rounded-l-xl'; } else { messageWrapper.classList.add('self-start', 'items-start'); bubbleClass = 'bg-gray-700 text-white rounded-t-xl rounded-r-xl'; } const messageElement = document.createElement('div'); const bubbleClasses = bubbleClass.split(' '); messageElement.classList.add('p-4', 'shadow-md', ...bubbleClasses); if (sender === 'bot') { messageElement.classList.add('rendered-markdown'); messageElement.innerHTML = marked.parse(text); } else { messageElement.innerHTML = `<p>${text.replace(/\n/g, '<br>')}</p>`; } messageWrapper.appendChild(messageElement); chatWindow.appendChild(messageWrapper); chatWindow.scrollTop = chatWindow.scrollHeight; return messageElement; }
-        function showPromptSuggestions() { const suggestionsContainer = document.getElementById('prompt-suggestions'); if (!suggestionsContainer) return; suggestionsContainer.innerHTML = ''; const suggestions = ["Jurusan apa saja yang ada?", "Berapa biaya pendaftaran?", "Bantu saya rencanakan karir"]; suggestions.forEach(prompt => { const button = document.createElement('button'); button.classList.add('bg-gray-700', 'p-2', 'rounded-lg', 'text-left', 'hover:bg-gray-600', 'transition-colors', 'text-sm', 'border', 'border-gray-600'); button.textContent = prompt; button.onclick = () => { userInput.value = prompt; handleUserInput(); }; suggestionsContainer.appendChild(button); }); promptSuggestionsContainer.style.display = 'flex'; }
-        function updateStatus(text) { statusText.textContent = text; }
-        
-        async function callGroqAPI(payload, botMessageElement) {
-            payload.stream = true;
-            const headers = { 
-                "Authorization": `Bearer ${atob(ENCODED_API_KEY)}`,
-                "Content-Type": "application/json" 
-            }; 
-            const response = await fetch(API_URL, { 
-                method: 'POST', 
-                headers: headers, 
-                body: JSON.stringify(payload) 
-            });
-
-            if (!response.ok) {
-                let errorMsg = `API request failed with status ${response.status}`;
-                if (response.status === 401) {
-                    errorMsg = "Otentikasi Gagal. Kunci API tidak valid atau salah. **Pastikan Anda telah mengganti placeholder dengan Kunci API Groq yang sudah di-encode dengan benar.**";
-                } else {
-                    const errorBody = await response.text();
-                    console.error("Groq API Error Body:", errorBody);
-                }
-                throw new Error(errorMsg);
-            }
-
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let fullResponse = "";
-            while (true) {
-                const { value, done } = await reader.read();
-                if (done) break;
-                const chunk = decoder.decode(value);
-                const lines = chunk.split('\n');
-                for (const line of lines) {
-                    if (line.startsWith('data: ')) {
-                        const data = line.substring(6);
-                        if (data.trim() === '[DONE]') return fullResponse;
-                        try {
-                            const parsed = JSON.parse(data);
-                            const content = parsed.choices[0]?.delta?.content || "";
-                            if (content) {
-                                fullResponse += content;
-                                botMessageElement.innerHTML = marked.parse(fullResponse);
-                                chatWindow.scrollTop = chatWindow.scrollHeight;
-                            }
-                        } catch (e) {}
-                    }
-                }
-            }
-            return fullResponse;
+      function displayMessage(text, sender) {
+        const messageWrapper = document.createElement("div");
+        messageWrapper.classList.add("flex", "flex-col", "max-w-xl", "animate-fade-in-up");
+        let bubbleClass;
+        if (sender === "user") {
+          messageWrapper.classList.add("self-end", "items-end");
+          bubbleClass = "bg-purple-600 text-white rounded-t-xl rounded-l-xl";
+        } else {
+          messageWrapper.classList.add("self-start", "items-start");
+          bubbleClass = "bg-gray-700 text-white rounded-t-xl rounded-r-xl";
         }
+        const messageElement = document.createElement("div");
+        const bubbleClasses = bubbleClass.split(" ");
+        messageElement.classList.add("p-4", "shadow-md", ...bubbleClasses);
+        if (sender === "bot") {
+          messageElement.classList.add("rendered-markdown");
+          messageElement.innerHTML = marked.parse(text);
+        } else {
+          messageElement.innerHTML = `<p>${text.replace(/\n/g, "<br>")}</p>`;
+        }
+        messageWrapper.appendChild(messageElement);
+        chatWindow.appendChild(messageWrapper);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+        return messageElement;
+      }
 
-        async function getRegularBotResponse(query, botMessageElement) { updateStatus("Menghubungi AI super cepat..."); const messages = [ {"role": "system", "content": "Anda adalah asisten AI dari kampus LP3I. Jawab pertanyaan dalam bahasa Indonesia dengan ramah dan informatif. Gunakan format Markdown jika perlu."}, ...chatHistory, {"role": "user", "content": query} ]; const payload = { "model": "llama3-8b-8192", "messages": messages }; return await callGroqAPI(payload, botMessageElement); }
-        async function getCareerPlan(query, botMessageElement) { updateStatus(`✨ Membuat rencana karir...`); const messages = [ { role: "system", content: "Anda adalah seorang konselor karir ahli. Buatkan daftar 3-4 prospek karir. Untuk setiap karir, jelaskan: 1. Deskripsi Singkat. 2. Skill Utama. Gunakan format Markdown." }, ...chatHistory, { role: "user", content: `Jurusan: "${query}"` } ]; const payload = { model: "llama3-8b-8192", "messages": messages }; return await callGroqAPI(payload, botMessageElement); }
-        async function getMajorComparison(major1, major2, botMessageElement) { updateStatus(`⚖️ Membandingkan jurusan...`); const messages = [ { role: "system", content: "Anda adalah analis pendidikan. Buat tabel perbandingan Markdown antara dua jurusan. Kolom: 'Aspek', Jurusan 1, Jurusan 2. Baris: 'Fokus Utama', 'Prospek Karir', 'Tipe Mahasiswa Ideal'." }, ...chatHistory, { role: "user", content: `Bandingkan antara "${major1}" dan "${major2}".` } ]; const payload = { model: "llama3-8b-8192", "messages": messages }; return await callGroqAPI(payload, botMessageElement); }
-        async function getInterviewQuestions(jobTitle, botMessageElement) { updateStatus(`🎙️ Membuat pertanyaan wawancara...`); const messages = [ { role: "system", content: "Anda adalah seorang HRD Manager. Buatkan daftar 5 pertanyaan wawancara untuk sebuah posisi, beserta tips singkat cara menjawabnya. Gunakan format Markdown." }, ...chatHistory, { role: "user", content: `Posisi: "${jobTitle}"` } ]; const payload = { model: "llama3-8b-8192", "messages": messages }; return await callGroqAPI(payload, botMessageElement); }
-        async function getMajorRecommendation(botMessageElement) { updateStatus(`🧠 Menganalisis jawaban Anda...`); const compiledAnswers = `Jawaban 1 (Minat): ${quizState.answers[0]}. Jawaban 2 (Gaya Belajar): ${quizState.answers[1]}. Jawaban 3 (Tujuan Karir): ${quizState.answers[2]}.`; const messages = [ { role: "system", content: "Anda adalah konselor pendidikan ahli untuk LP3I. Berdasarkan jawaban kuis minat dari seorang calon mahasiswa, berikan rekomendasi 1-2 jurusan di LP3I yang paling cocok. Jelaskan alasannya secara personal dan meyakinkan. Jurusan yang tersedia: Administrasi Perkantoran, Hubungan Masyarakat, Akuntansi Komputer, Manajemen Informatika, Administrasi Bisnis Internasional, Bisnis Digital, Logistik Perdagangan Internasional." }, { role: "user", content: `Berikut adalah jawaban saya untuk kuis minat: "${compiledAnswers}". Berikan saya rekomendasi jurusan.` } ]; const payload = { model: "llama3-8b-8192", "messages": messages }; return await callGroqAPI(payload, botMessageElement); }
-        
-        async function handleUserInput() { 
-            if (ENCODED_API_KEY === "GANTI_DENGAN_TEKS_HASIL_ENKRIPSI_ANDA") {
-                displayMessage("**Error: Kunci API belum diatur.** Silakan edit file `index.html` dan masukkan Kunci API Groq Anda yang sudah di-encode.", 'bot');
-                return;
-            }
-            const query = userInput.value.trim(); if (query === "") return; promptSuggestionsContainer.style.display = 'none'; displayMessage(query, 'user'); userInput.value = ""; sendButton.disabled = true; if (quizState.active) { quizState.answers.push(query); quizState.currentQuestionIndex++; if (quizState.currentQuestionIndex < quizQuestions.length) { displayMessage(quizQuestions[quizState.currentQuestionIndex], 'bot'); sendButton.disabled = false; userInput.focus(); } else { quizState.active = false; const botMessageElement = displayMessage("", 'bot'); botMessageElement.innerHTML = `<div class="p-4 rendered-markdown"><span class="animate-pulse">...</span></div>`; const botResponse = await getMajorRecommendation(botMessageElement); chatHistory.push({ role: 'user', content: "Kuis Rekomendasi Jurusan dan jawabannya." }); chatHistory.push({ role: 'assistant', content: botResponse }); sendButton.disabled = false; userInput.placeholder = "Tanyakan sesuatu atau pilih fitur AI..."; userInput.focus(); updateStatus(""); } return; } const botMessageElement = displayMessage("", 'bot'); botMessageElement.innerHTML = `<div class="p-4 rendered-markdown"><span class="animate-pulse">...</span></div>`; let botResponse = ""; const currentFeature = activeFeature; activeFeature = null; try { const lowerCaseQuery = query.toLowerCase(); let foundInKB = false; for (const key in knowledgeBase) { if (knowledgeBase[key].keywords.some(k => lowerCaseQuery.includes(k))) { botResponse = knowledgeBase[key].jawaban; botMessageElement.innerHTML = `<div class="p-4 rendered-markdown">${marked.parse(botResponse)}</div>`; foundInKB = true; break; } } if (!foundInKB) { chatHistory.push({ role: 'user', content: query }); switch (currentFeature) { case 'career': botResponse = await getCareerPlan(query, botMessageElement); break; case 'compare_1': majorToCompare = query; activeFeature = 'compare_2'; botResponse = `Baik, jurusan pertama adalah **${query}**. Sekarang, masukkan jurusan kedua yang ingin Anda bandingkan.`; botMessageElement.innerHTML = `<div class="p-4 rendered-markdown">${marked.parse(botResponse)}</div>`; break; case 'compare_2': chatHistory.pop(); chatHistory.push({ role: 'user', content: `Bandingkan ${majorToCompare} dan ${query}` }); botResponse = await getMajorComparison(majorToCompare, query, botMessageElement); majorToCompare = ''; break; case 'interview': botResponse = await getInterviewQuestions(query, botMessageElement); break; default: botResponse = await getRegularBotResponse(query, botMessageElement); } } } catch (error) { console.error("Error in handleUserInput:", error); botResponse = error.message || "Maaf, terjadi kesalahan saat menghubungi AI."; botMessageElement.innerHTML = `<div class="p-4 rendered-markdown">${marked.parse(botResponse)}</div>`; } finally { if (activeFeature !== 'compare_2' && !quizState.active) { const rawBotResponse = botResponse.replace(/<[^>]*>/g, '').replace(/<br>/g, '\n'); chatHistory.push({ role: 'assistant', content: rawBotResponse }); if (chatHistory.length > 12) { chatHistory = chatHistory.slice(-12); } } sendButton.disabled = false; userInput.focus(); updateStatus(""); } }
-        sendButton.addEventListener('click', handleUserInput);
-        userInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleUserInput(); });
-        careerPlanButton.addEventListener('click', () => { activeFeature = 'career'; displayMessage("Tentu! ✨ Jurusan apa yang Anda minati untuk saya buatkan rencana karirnya?", 'bot'); userInput.placeholder = "Ketik nama jurusan..."; userInput.focus(); });
-        compareMajorButton.addEventListener('click', () => { activeFeature = 'compare_1'; displayMessage("Tentu! ⚖️ Masukkan nama jurusan pertama yang ingin dibandingkan.", 'bot'); userInput.placeholder = "Jurusan pertama, misal: Informatika Komputer"; userInput.focus(); });
-        interviewSimButton.addEventListener('click', () => { activeFeature = 'interview'; displayMessage("Siap! 🎙️ Masukkan nama posisi pekerjaan untuk simulasi wawancara.", 'bot'); userInput.placeholder = "Posisi pekerjaan, misal: Digital Marketer"; userInput.focus(); });
-        majorQuizButton.addEventListener('click', () => { quizState = { active: true, currentQuestionIndex: 0, answers: [] }; chatHistory = []; chatWindow.innerHTML = ''; promptSuggestionsContainer.style.display = 'none'; displayMessage(quizQuestions[0], 'bot'); userInput.placeholder = "Ketik jawaban Anda..."; userInput.focus(); });
-        
-        clearChatButton.addEventListener('click', () => {
-            chatWindow.innerHTML = '';
-            chatHistory = [];
-            displayMessage("Halo! Saya AI LP3I, AI dengan respon super cepat. Silakan bertanya.", 'bot');
-            showPromptSuggestions();
+      function showPromptSuggestions() {
+        const suggestionsContainer = document.getElementById("prompt-suggestions");
+        if (!suggestionsContainer) return;
+        suggestionsContainer.innerHTML = "";
+        const suggestions = [];
+        suggestions.forEach((prompt) => {
+          const button = document.createElement("button");
+          button.classList.add("bg-gray-700", "p-2", "rounded-lg", "text-left", "hover:bg-gray-600", "transition-colors", "text-sm", "border", "border-gray-600");
+          button.textContent = prompt;
+          button.onclick = () => {
+            userInput.value = prompt;
+            promptSuggestionsContainer.style.display = "none";
+            handleUserInput();
+          };
+          suggestionsContainer.appendChild(button);
         });
+        promptSuggestionsContainer.style.display = "flex";
+      }
 
-        const canvas = document.createElement('canvas');
-        canvas.id = 'background-canvas';
-        document.body.insertBefore(canvas, document.body.firstChild);
-        const ctx = canvas.getContext('2d');
-        let particles = [];
+      function updateStatus(text) {
+        statusText.textContent = text;
+      }
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-
-        function createParticles() {
-            particles = [];
-            const particleCount = Math.floor((canvas.width * canvas.height) / 15000);
-            for (let i = 0; i < particleCount; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    vx: (Math.random() - 0.5) * 0.3,
-                    vy: (Math.random() - 0.5) * 0.3,
-                    radius: Math.random() * 1.5 + 1,
-                });
-            }
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                p.x += p.vx;
-                p.y += p.vy;
-                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(168, 85, 247, 0.4)';
-                ctx.fill();
-            });
-            for (let i = 0; i < particles.length; i++) {
-                for (let j = i; j < particles.length; j++) {
-                    const dx = particles[i].x - particles[j].x;
-                    const dy = particles[i].y - particles[j].y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    if (distance < 120) {
-                        ctx.beginPath();
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.strokeStyle = `rgba(168, 85, 247, ${1 - distance / 120})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.stroke();
-                    }
-                }
-            }
-            requestAnimationFrame(animate);
-        }
-
-        window.onload = () => {
-            displayMessage("Halo! Saya AI LP3I, AI dengan respon super cepat. Silakan bertanya.", 'bot');
-            showPromptSuggestions();
-            userInput.focus();
-            
-            resizeCanvas();
-            createParticles();
-            animate();
+      async function callGroqAPI(payload, botMessageElement) {
+        payload.stream = true;
+        const headers = {
+          Authorization: `Bearer ${atob(ENCODED_API_KEY)}`,
+          "Content-Type": "application/json",
         };
-        
-        window.addEventListener('resize', () => {
-            resizeCanvas();
-            createParticles();
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify(payload),
         });
+
+        if (!response.ok) {
+          let errorMsg = `API request failed with status ${response.status}`;
+          if (response.status === 401) {
+            errorMsg = "Otentikasi Gagal. Kunci API tidak valid atau salah. **Pastikan Anda telah mengganti placeholder dengan Kunci API Groq yang sudah di-encode dengan benar.**";
+          } else {
+            const errorBody = await response.text();
+            console.error("Groq API Error Body:", errorBody);
+          }
+          throw new Error(errorMsg);
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let fullResponse = "";
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value);
+          const lines = chunk.split("\n");
+          for (const line of lines) {
+            if (line.startsWith("data: ")) {
+              const data = line.substring(6);
+              if (data.trim() === "[DONE]") return fullResponse;
+              try {
+                const parsed = JSON.parse(data);
+                const content = parsed.choices[0]?.delta?.content || "";
+                if (content) {
+                  fullResponse += content;
+                  botMessageElement.innerHTML = marked.parse(fullResponse);
+                  chatWindow.scrollTop = chatWindow.scrollHeight;
+                }
+              } catch (e) {}
+            }
+          }
+        }
+        return fullResponse;
+      }
+
+      async function getRegularBotResponse(query, botMessageElement) {
+        updateStatus("Menghubungi AI super cepat...");
+        const messages = [
+          { role: "system", content: "Anda adalah asisten AI dari kampus LP3I. Jawab pertanyaan dalam bahasa Indonesia dengan ramah dan informatif. Gunakan format Markdown jika perlu." },
+          ...chatHistory,
+          { role: "user", content: query },
+        ];
+        const payload = { model: "llama3-8b-8192", messages: messages };
+        return await callGroqAPI(payload, botMessageElement);
+      }
+      async function getCareerPlan(query, botMessageElement) {
+        updateStatus(`✨ Membuat rencana karir...`);
+        const messages = [
+          { role: "system", content: "Anda adalah seorang konselor karir ahli. Buatkan daftar 3-4 prospek karir. Untuk setiap karir, jelaskan: 1. Deskripsi Singkat. 2. Skill Utama. Gunakan format Markdown." },
+          ...chatHistory,
+          { role: "user", content: `Jurusan: "${query}"` },
+        ];
+        const payload = { model: "llama3-8b-8192", messages: messages };
+        return await callGroqAPI(payload, botMessageElement);
+      }
+      async function getMajorComparison(major1, major2, botMessageElement) {
+        updateStatus(`⚖️ Membandingkan jurusan...`);
+        const messages = [
+          { role: "system", content: "Anda adalah analis pendidikan. Buat tabel perbandingan Markdown antara dua jurusan. Kolom: 'Aspek', Jurusan 1, Jurusan 2. Baris: 'Fokus Utama', 'Prospek Karir', 'Tipe Mahasiswa Ideal'." },
+          ...chatHistory,
+          { role: "user", content: `Bandingkan antara "${major1}" dan "${major2}".` },
+        ];
+        const payload = { model: "llama3-8b-8192", messages: messages };
+        return await callGroqAPI(payload, botMessageElement);
+      }
+      async function getInterviewQuestions(jobTitle, botMessageElement) {
+        updateStatus(`🎙️ Membuat pertanyaan wawancara...`);
+        const messages = [
+          { role: "system", content: "Anda adalah seorang HRD Manager. Buatkan daftar 5 pertanyaan wawancara untuk sebuah posisi, beserta tips singkat cara menjawabnya. Gunakan format Markdown." },
+          ...chatHistory,
+          { role: "user", content: `Posisi: "${jobTitle}"` },
+        ];
+        const payload = { model: "llama3-8b-8192", messages: messages };
+        return await callGroqAPI(payload, botMessageElement);
+      }
+      async function getMajorRecommendation(botMessageElement) {
+        updateStatus(`🧠 Menganalisis jawaban Anda...`);
+        const compiledAnswers = `Jawaban 1 (Minat): ${quizState.answers[0]}. Jawaban 2 (Gaya Belajar): ${quizState.answers[1]}. Jawaban 3 (Tujuan Karir): ${quizState.answers[2]}.`;
+        const messages = [
+          {
+            role: "system",
+            content:
+              "Anda adalah konselor pendidikan ahli untuk LP3I. Berdasarkan jawaban kuis minat dari seorang calon mahasiswa, berikan rekomendasi 1-2 jurusan di LP3I yang paling cocok. Jelaskan alasannya secara personal dan meyakinkan. Jurusan yang tersedia: Administrasi Perkantoran, Hubungan Masyarakat, Akuntansi Komputer, Manajemen Informatika, Administrasi Bisnis Internasional, Bisnis Digital, Logistik Perdagangan Internasional.",
+          },
+          { role: "user", content: `Berikut adalah jawaban saya untuk kuis minat: "${compiledAnswers}". Berikan saya rekomendasi jurusan.` },
+        ];
+        const payload = { model: "llama3-8b-8192", messages: messages };
+        return await callGroqAPI(payload, botMessageElement);
+      }
+
+      async function handleUserInput() {
+        if (ENCODED_API_KEY === "GANTI_DENGAN_TEKS_HASIL_ENKRIPSI_ANDA") {
+          displayMessage("**Error: Kunci API belum diatur.** Silakan edit file `index.html` dan masukkan Kunci API Groq Anda yang sudah di-encode.", "bot");
+          return;
+        }
+        const query = userInput.value.trim();
+        if (query === "") return;
+        promptSuggestionsContainer.style.display = "none";
+        displayMessage(query, "user");
+        userInput.value = "";
+        sendButton.disabled = true;
+        if (quizState.active) {
+          quizState.answers.push(query);
+          quizState.currentQuestionIndex++;
+          if (quizState.currentQuestionIndex < quizQuestions.length) {
+            displayMessage(quizQuestions[quizState.currentQuestionIndex], "bot");
+            sendButton.disabled = false;
+            userInput.focus();
+          } else {
+            quizState.active = false;
+            const botMessageElement = displayMessage("", "bot");
+            botMessageElement.innerHTML = `<div class="p-4 rendered-markdown"><span class="animate-pulse">...</span></div>`;
+            const botResponse = await getMajorRecommendation(botMessageElement);
+            chatHistory.push({ role: "user", content: "Kuis Rekomendasi Jurusan dan jawabannya." });
+            chatHistory.push({ role: "assistant", content: botResponse });
+            sendButton.disabled = false;
+            userInput.placeholder = "Tanyakan sesuatu atau pilih fitur AI...";
+            userInput.focus();
+            updateStatus("");
+          }
+          return;
+        }
+        const botMessageElement = displayMessage("", "bot");
+        botMessageElement.innerHTML = `<div class="p-4 rendered-markdown"><span class="animate-pulse">...</span></div>`;
+        let botResponse = "";
+        const currentFeature = activeFeature;
+        activeFeature = null;
+        try {
+          const lowerCaseQuery = query.toLowerCase();
+          let foundInKB = false;
+          for (const key in knowledgeBase) {
+            if (knowledgeBase[key].keywords.some((k) => lowerCaseQuery.includes(k))) {
+              botResponse = knowledgeBase[key].jawaban;
+              botMessageElement.innerHTML = `<div class="p-4 rendered-markdown">${marked.parse(botResponse)}</div>`;
+              foundInKB = true;
+              break;
+            }
+          }
+          if (!foundInKB) {
+            chatHistory.push({ role: "user", content: query });
+            switch (currentFeature) {
+              case "career":
+                botResponse = await getCareerPlan(query, botMessageElement);
+                break;
+              case "compare_1":
+                majorToCompare = query;
+                activeFeature = "compare_2";
+                botResponse = `Baik, jurusan pertama adalah **${query}**. Sekarang, masukkan jurusan kedua yang ingin Anda bandingkan.`;
+                botMessageElement.innerHTML = `<div class="p-4 rendered-markdown">${marked.parse(botResponse)}</div>`;
+                break;
+              case "compare_2":
+                chatHistory.pop();
+                chatHistory.push({ role: "user", content: `Bandingkan ${majorToCompare} dan ${query}` });
+                botResponse = await getMajorComparison(majorToCompare, query, botMessageElement);
+                majorToCompare = "";
+                break;
+              case "interview":
+                botResponse = await getInterviewQuestions(query, botMessageElement);
+                break;
+              case "faq":
+                botResponse = "Silakan masukkan pertanyaan Anda terkait FAQ (misalnya: jadwal kuliah, beasiswa, atau magang), dan saya akan mencarikan jawabannya untuk Anda.";
+                botMessageElement.innerHTML = `<div class="p-4 rendered-markdown">${marked.parse(botResponse)}</div>`;
+                activeFeature = "faq_search";
+                break;
+              case "faq_search":
+                let found = false;
+                for (const key in knowledgeBase) {
+                  if (knowledgeBase[key].keywords.some((k) => lowerCaseQuery.includes(k))) {
+                    botResponse = knowledgeBase[key].jawaban;
+                    botMessageElement.innerHTML = `<div class="p-4 rendered-markdown">${marked.parse(botResponse)}</div>`;
+                    found = true;
+                    break;
+                  }
+                }
+                if (!found) {
+                  botResponse = "Maaf, saya tidak menemukan jawaban untuk pertanyaan Anda di FAQ. Coba tanyakan hal lain atau gunakan fitur lain!";
+                  botMessageElement.innerHTML = `<div class="p-4 rendered-markdown">${marked.parse(botResponse)}</div>`;
+                }
+                break;
+              default:
+                botResponse = await getRegularBotResponse(query, botMessageElement);
+            }
+          }
+        } catch (error) {
+          console.error("Error in handleUserInput:", error);
+          botResponse = error.message || "Maaf, terjadi kesalahan saat menghubungi AI.";
+          botMessageElement.innerHTML = `<div class="p-4 rendered-markdown">${marked.parse(botResponse)}</div>`;
+        } finally {
+          if (activeFeature !== "compare_2" && !quizState.active && activeFeature !== "faq_search") {
+            const rawBotResponse = botResponse.replace(/<[^>]*>/g, "").replace(/<br>/g, "\n");
+            chatHistory.push({ role: "assistant", content: rawBotResponse });
+            if (chatHistory.length > 12) {
+              chatHistory = chatHistory.slice(-12);
+            }
+          }
+          sendButton.disabled = false;
+          userInput.focus();
+          updateStatus("");
+          if (promptCount < 1 && activeFeature !== "faq_search" && activeFeature !== "compare_2" && !quizState.active) {
+            showPromptSuggestions();
+          }
+          promptCount++;
+        }
+      }
+      sendButton.addEventListener("click", () => {
+        promptSuggestionsContainer.style.display = "none";
+        handleUserInput();
+      });
+      userInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          promptSuggestionsContainer.style.display = "none";
+          handleUserInput();
+        }
+      });
+      careerPlanButton.addEventListener("click", () => {
+        activeFeature = "career";
+        promptSuggestionsContainer.style.display = "none";
+        displayMessage("Tentu! ✨ Jurusan apa yang Anda minati untuk saya buatkan rencana karirnya?", "bot");
+        userInput.placeholder = "Ketik nama jurusan...";
+        userInput.focus();
+      });
+      compareMajorButton.addEventListener("click", () => {
+        activeFeature = "compare_1";
+        promptSuggestionsContainer.style.display = "none";
+        displayMessage("Tentu! ⚖️ Masukkan nama jurusan pertama yang ingin dibandingkan.", "bot");
+        userInput.placeholder = "Jurusan pertama, misal: Informatika Komputer";
+        userInput.focus();
+      });
+      interviewSimButton.addEventListener("click", () => {
+        activeFeature = "interview";
+        promptSuggestionsContainer.style.display = "none";
+        displayMessage("Siap! 🎙️ Masukkan nama posisi pekerjaan untuk simulasi wawancara.", "bot");
+        userInput.placeholder = "Posisi pekerjaan, misal: Digital Marketer";
+        userInput.focus();
+      });
+      majorQuizButton.addEventListener("click", () => {
+        quizState = { active: true, currentQuestionIndex: 0, answers: [] };
+        chatHistory = [];
+        chatWindow.innerHTML = "";
+        promptSuggestionsContainer.style.display = "none";
+        displayMessage(quizQuestions[0], "bot");
+        userInput.placeholder = "Ketik jawaban Anda...";
+        userInput.focus();
+      });
+      faqButton.addEventListener("click", () => {
+        activeFeature = "faq";
+        promptSuggestionsContainer.style.display = "none";
+        displayMessage("❓ Selamat datang di Info LP3I Ciputat! Tanyakan apa saja tentang jadwal kuliah, beasiswa, magang, atau topik lain, dan saya akan mencarikan jawabannya untuk Anda.", "bot");
+        userInput.placeholder = "Tanyakan tentang FAQ, misal: jadwal kuliah";
+        userInput.focus();
+      });
+
+      clearChatButton.addEventListener("click", () => {
+        chatWindow.innerHTML = "";
+        chatHistory = [];
+        displayMessage("Halo! Saya AI LP3I, AI dengan respon super cepat. Silakan bertanya.", "bot");
+        showPromptSuggestions();
+        promptCount = 0;
+      });
+
+      const canvas = document.createElement("canvas");
+      canvas.id = "background-canvas";
+      document.body.insertBefore(canvas, document.body.firstChild);
+      const ctx = canvas.getContext("2d");
+      let particles = [];
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+
+      function createParticles() {
+        particles = [];
+        const particleCount = Math.floor((canvas.width * canvas.height) / 15000);
+        for (let i = 0; i < particleCount; i++) {
+          particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 0.3,
+            vy: (Math.random() - 0.5) * 0.3,
+            radius: Math.random() * 1.5 + 1,
+          });
+        }
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((p) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+          if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(168, 85, 247, 0.4)";
+          ctx.fill();
+        });
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < 120) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = `rgba(168, 85, 247, ${1 - distance / 120})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(animate);
+      }
+
+      window.onload = () => {
+        displayMessage("Silakan bertanya seputar LP3I Ciputat atau membantu tugas anda", "bot");
+        showPromptSuggestions();
+        userInput.focus();
+
+        resizeCanvas();
+        createParticles();
+        animate();
+      };
+
+      window.addEventListener("resize", () => {
+        resizeCanvas();
+        createParticles();
+      });
     </script>
-</body>
+  </body>
 </html>
